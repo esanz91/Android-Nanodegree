@@ -1,0 +1,23 @@
+/captures
+/local.properties
+.DS_Store
+
+# Java
+*.class
+
+# Generated files
+bin/
+gen/
+out/
+
+# Gradle files
+.gradle
+/build
+
+# Android Studio
+.externalNativeBuild
+captures/
+
+# IntelliJ
+*.iml
+.idea/*
