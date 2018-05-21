@@ -1,4 +1,4 @@
-package com.esanz.nano.popularmovies;
+package com.esanz.nano.movies;
 
 import org.junit.Test;
 

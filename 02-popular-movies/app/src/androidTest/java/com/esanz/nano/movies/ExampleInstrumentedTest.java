@@ -1,4 +1,4 @@
-package com.esanz.nano.popularmovies;
+package com.esanz.nano.movies;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("com.esanz.nano.popularmovies", appContext.getPackageName());
+        assertEquals("com.esanz.nano.movies", appContext.getPackageName());
     }
 }
