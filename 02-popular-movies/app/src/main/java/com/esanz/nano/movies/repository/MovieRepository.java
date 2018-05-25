@@ -13,11 +13,11 @@ public class MovieRepository {
 
     private final MovieDataSource movieRemoteDataSource;
 
-    private MovieRepository(@NonNull MovieDataSource movieRemoteDataSource) {
+    private MovieRepository(@NonNull final MovieDataSource movieRemoteDataSource) {
         this.movieRemoteDataSource = Objects.requireNonNull(movieRemoteDataSource);
     }
 
-    public static MovieRepository getInstance(@NonNull MovieDataSource movieDataSource) {
+    public static MovieRepository getInstance(@NonNull final MovieDataSource movieDataSource) {
         if (null == INSTANCE) {
             INSTANCE = new MovieRepository(movieDataSource);
         }
@@ -37,7 +37,7 @@ public class MovieRepository {
     private void getTopRatedMoviesFromRemote(@NonNull final MovieDataSource.LoadTopRatedMoviesCallback callback) {
         movieRemoteDataSource.getTopRatedMovies(new MovieDataSource.LoadTopRatedMoviesCallback() {
             @Override
-            public void onTopRatedMoviesLoaded(@Nullable TopRatedResponse response) {
+            public void onTopRatedMoviesLoaded(@Nullable final TopRatedResponse response) {
                 // TODO refresh cache
                 // TODO refresh local DB
 

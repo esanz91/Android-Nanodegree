@@ -10,7 +10,7 @@ public class ViewModelFactory implements ViewModelProvider.Factory {
 
     private final MovieRepository movieRepository;
 
-    public ViewModelFactory(MovieRepository movieRepository) {
+    public ViewModelFactory(@NonNull final MovieRepository movieRepository) {
         this.movieRepository = movieRepository;
     }
 

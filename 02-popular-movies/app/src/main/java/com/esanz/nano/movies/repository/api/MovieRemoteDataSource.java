@@ -26,7 +26,7 @@ public class MovieRemoteDataSource implements MovieDataSource {
     }
 
     @Override
-    public void getTopRatedMovies(final @NonNull LoadTopRatedMoviesCallback callback) {
+    public void getTopRatedMovies(@NonNull final LoadTopRatedMoviesCallback callback) {
         // TODO make Result Wrapper to handle errors
         MovieApplication.movieApi.getTopRated()
                 .subscribeOn(Schedulers.io())

@@ -3,7 +3,6 @@ package com.esanz.nano.movies.ui;
 import android.arch.lifecycle.ViewModelProviders;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 
 import com.esanz.nano.movies.R;
 import com.esanz.nano.movies.repository.MovieRepository;
@@ -27,7 +26,6 @@ public class MainActivity extends AppCompatActivity {
         movieViewModel.topRatedLiveData
                 .observe(this, (topRatedResponse) -> {
                     // TODO show movies in RecyclerView
-                    Log.d("zzz", "topRatedResponse");
                 });
     }
 
