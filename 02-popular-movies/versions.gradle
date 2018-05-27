@@ -3,7 +3,7 @@ ext {
             buildTools          : '3.1.2',
 
             compileSdk          : 27,
-            minSdk              : 26,
+            minSdk              : 21,
             targetSdk           : 27,
 
             appCompat           : '27.1.1',
