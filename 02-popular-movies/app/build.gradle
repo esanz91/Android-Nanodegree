@@ -35,6 +35,8 @@ dependencies {
     implementation "android.arch.lifecycle:runtime:$versions.archLifecycle"
     implementation "android.arch.lifecycle:common-java8:$versions.archLifecycle"
 
+    implementation "com.squareup.picasso:picasso:$versions.picasso"
+
     implementation "com.squareup.retrofit2:retrofit:$versions.retrofit"
     implementation "com.squareup.retrofit2:converter-gson:$versions.retrofit"
     implementation "com.squareup.retrofit2:adapter-rxjava2:$versions.retrofit"

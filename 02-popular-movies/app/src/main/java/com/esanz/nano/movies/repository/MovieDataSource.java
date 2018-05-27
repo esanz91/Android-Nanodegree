@@ -11,7 +11,7 @@ import com.esanz.nano.movies.repository.model.TopRatedResponse;
 public interface MovieDataSource {
 
     interface LoadTopRatedMoviesCallback {
-        void onTopRatedMoviesLoaded(@Nullable TopRatedResponse response);
+        void onTopRatedMoviesLoaded(@Nullable final TopRatedResponse response);
 
         void onMoviesNotAvailable();
     }
