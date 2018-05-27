@@ -6,7 +6,7 @@ ext {
             minSdk              : 21,
             targetSdk           : 27,
 
-            appCompat           : '27.1.1',
+            androidSupport      : '27.1.1',
             constraintLayout    : '1.1.0',
             archLifecycle       : '1.1.1',
 
