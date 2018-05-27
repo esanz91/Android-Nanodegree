@@ -1,7 +1,11 @@
 package com.esanz.nano.movies.ui;
 
+import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityOptionsCompat;
+import android.support.v4.util.Pair;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,12 +20,18 @@ import java.util.List;
 
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHolder> {
 
+    public interface OnMovieClickListener {
+        void onMovieClick(Movie movie, Pair<View, String> transition);
+    }
+
     @LayoutRes
     private final int layout = R.layout.list_item_poster;
 
     private List<Movie> movies;
+    private OnMovieClickListener listener;
 
-    public static class MovieViewHolder extends RecyclerView.ViewHolder {
+    public class MovieViewHolder extends RecyclerView.ViewHolder
+        implements View.OnClickListener {
 
         private View itemView;
         private ImageView imageView;
@@ -30,6 +40,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
             super(itemView);
             this.itemView = itemView;
             this.imageView = itemView.findViewById(R.id.poster);
+            itemView.setOnClickListener(this);
         }
 
         public void bindMovie(Movie movie) {
@@ -38,9 +49,17 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
                     .into(imageView);
         }
 
+
+        @Override
+        public void onClick(View v) {
+            Movie movie = movies.get(getAdapterPosition());
+            Pair<View, String> transition = new Pair<>(imageView, "movie_poster");
+            listener.onMovieClick(movie, transition);
+        }
     }
 
-    public MovieAdapter() {
+    public MovieAdapter(OnMovieClickListener listener) {
+        this.listener = listener;
     }
 
     @NonNull
