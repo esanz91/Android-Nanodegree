@@ -1,10 +1,7 @@
 package com.esanz.nano.movies.ui;
 
-import android.content.Context;
-import android.content.Intent;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.util.Pair;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -21,7 +18,7 @@ import java.util.List;
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHolder> {
 
     public interface OnMovieClickListener {
-        void onMovieClick(Movie movie, Pair<View, String> transition);
+        void onMoviePosterClick(Movie movie, Pair<View, String> transition);
     }
 
     @LayoutRes
@@ -54,7 +51,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
         public void onClick(View v) {
             Movie movie = movies.get(getAdapterPosition());
             Pair<View, String> transition = new Pair<>(imageView, "movie_poster");
-            listener.onMovieClick(movie, transition);
+            listener.onMoviePosterClick(movie, transition);
         }
     }
 

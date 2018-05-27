@@ -9,7 +9,7 @@ public class Movie implements Parcelable {
 
     private static final String IMAGE_SECURE_BASE_URL = "https://image.tmdb.org/t/p/";
     private static final String POSTER_SIZE_PATH = "w342";
-    private static final String BACKDROP_SIZE_PATH = "w500";
+    private static final String BACKDROP_SIZE_PATH = "w780";
 
     @SerializedName("id")
     public int id;

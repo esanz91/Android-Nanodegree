@@ -15,7 +15,8 @@ public class MovieDetailActivity extends AppCompatActivity {
 
     private static final String EXTRA_MOVIE = "movie";
 
-    private ImageView imageView;
+    private ImageView backdropView;
+    private ImageView posterView;
 
     // TODO store movies in Room and just pass in the id
     public static Intent createIntent(Context context, Movie movie) {
@@ -29,7 +30,8 @@ public class MovieDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_details);
 
-        imageView = findViewById(R.id.poster);
+        posterView = findViewById(R.id.poster);
+        backdropView = findViewById(R.id.backdrop);
 
         bindMovie(getIntent().getParcelableExtra(EXTRA_MOVIE));
     }
@@ -45,9 +47,12 @@ public class MovieDetailActivity extends AppCompatActivity {
     }
 
     private void bindMovie(Movie movie) {
-        Picasso.with(imageView.getContext())
+        Picasso.with(this)
+                .load(movie.getBackdropUrlString())
+                .into(backdropView);
+        Picasso.with(this)
                 .load(movie.getPosterUrlString())
-                .into(imageView);
+                .into(posterView);
     }
 
 }

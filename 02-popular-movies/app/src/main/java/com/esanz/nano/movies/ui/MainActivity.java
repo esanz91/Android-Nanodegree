@@ -44,10 +44,13 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onMovieClick(Movie movie, Pair<View, String> transition) {
+    public void onMoviePosterClick(Movie movie, Pair<View, String> moviePosterTransition) {
         Intent movieDetailIntent = MovieDetailActivity.createIntent(this, movie);
+
+        // TODO add and perfect animation
         ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(
-                this, transition);
+                this, moviePosterTransition);
+
         startActivity(movieDetailIntent, options.toBundle());
     }
 }
