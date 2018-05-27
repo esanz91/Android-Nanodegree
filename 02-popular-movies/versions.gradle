@@ -10,6 +10,8 @@ ext {
             constraintLayout    : '1.1.0',
             archLifecycle       : '1.1.1',
 
+            picasso             : '2.5.2',
+
             retrofit            : '2.4.0',
             okhttp              : '3.9.1',
             gson                : '2.8.4',
