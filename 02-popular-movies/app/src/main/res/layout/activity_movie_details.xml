@@ -37,7 +37,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 android:layout_gravity="bottom"
-                android:background="@color/black_25"
+                android:background="@color/secondaryDark25"
                 app:layout_collapseMode="pin"
                 tools:title="The Godfather 2" />
 
@@ -60,6 +60,7 @@
                 android:adjustViewBounds="true"
                 android:transitionName="movie_poster"
                 tools:src="@sample/poster" />
+
         </android.support.constraint.ConstraintLayout>
 
     </ScrollView>
