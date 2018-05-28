@@ -29,6 +29,7 @@ public class MovieDetailActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_details);
+        setSupportActionBar(findViewById(R.id.toolbar));
 
         posterView = findViewById(R.id.poster);
         backdropView = findViewById(R.id.backdrop);
@@ -47,6 +48,7 @@ public class MovieDetailActivity extends AppCompatActivity {
     }
 
     private void bindMovie(Movie movie) {
+        getSupportActionBar().setTitle(movie.title);
         Picasso.with(this)
                 .load(movie.getBackdropUrlString())
                 .into(backdropView);
