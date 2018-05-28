@@ -1,17 +1,23 @@
 package com.esanz.nano.movies.ui;
 
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Intent;
+import android.support.v4.app.ActivityOptionsCompat;
+import android.support.v4.util.Pair;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
 
 import com.esanz.nano.movies.R;
 import com.esanz.nano.movies.repository.MovieRepository;
 import com.esanz.nano.movies.repository.api.MovieRemoteDataSource;
+import com.esanz.nano.movies.repository.model.Movie;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity
+    implements MovieAdapter.OnMovieClickListener {
 
-    private final MovieAdapter movieAdapter = new MovieAdapter();
+    private final MovieAdapter movieAdapter = new MovieAdapter(this);
 
     private MovieViewModel movieViewModel;
 
@@ -21,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        setSupportActionBar(findViewById(R.id.toolbar));
 
         movieView = findViewById(R.id.movies);
         movieView.setAdapter(movieAdapter);
@@ -37,4 +44,15 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
+    @Override
+    public void onMoviePosterClick(Movie movie, Pair<View, String> moviePosterTransition) {
+        Intent movieDetailIntent = MovieDetailActivity.createIntent(this, movie);
+
+        // TODO add and perfect animation
+        /*ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(
+                this, moviePosterTransition);
+        startActivity(movieDetailIntent, options.toBundle());*/
+
+        startActivity(movieDetailIntent);
+    }
 }

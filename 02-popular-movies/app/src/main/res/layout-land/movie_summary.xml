@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="24dp">
+
+    <ImageView
+        android:id="@+id/poster"
+        android:layout_width="@dimen/poster_landscape"
+        android:layout_height="0dp"
+        android:adjustViewBounds="true"
+        android:transitionName="movie_poster"
+        app:layout_constraintDimensionRatio="W,2:3"
+        tools:src="@sample/poster" />
+
+    <TextView
+        android:id="@+id/title"
+        style="@style/MovieTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        app:layout_constraintBottom_toTopOf="@id/release_date_label"
+        app:layout_constraintLeft_toRightOf="@id/poster"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="The Godfather 2" />
+
+    <TextView
+        android:id="@+id/release_date_label"
+        style="@style/MovieCaption.LeftDrawable"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="18dp"
+        android:drawableLeft="@drawable/ic_round_calendar_today_24px"
+        android:drawablePadding="8dp"
+        android:text="@string/label_release_date"
+        app:layout_constraintBottom_toTopOf="@id/release_date"
+        app:layout_constraintLeft_toRightOf="@id/poster"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/title" />
+
+    <TextView
+        android:id="@+id/release_date"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="44dp"
+        app:layout_constraintBottom_toTopOf="@id/rating_label"
+        app:layout_constraintLeft_toRightOf="@id/poster"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/release_date_label"
+        tools:text="December 20, 1974" />
+
+    <TextView
+        android:id="@+id/rating_label"
+        style="@style/MovieCaption.LeftDrawable"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:drawableLeft="@drawable/ic_round_star_rate_18px"
+        android:drawablePadding="4dp"
+        android:text="@string/label_rating"
+        app:layout_constraintBottom_toTopOf="@id/rating"
+        app:layout_constraintLeft_toRightOf="@id/poster"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/release_date" />
+
+    <TextView
+        android:id="@+id/rating"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="44dp"
+        app:layout_constraintLeft_toRightOf="@id/poster"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/rating_label"
+        tools:text="4.5 / 5" />
+
+    <TextView
+        android:id="@+id/overview_label"
+        style="@style/MovieCaption"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="22dp"
+        android:layout_marginTop="16dp"
+        android:text="@string/label_overview"
+        app:layout_constraintBottom_toTopOf="@id/overview"
+        app:layout_constraintLeft_toRightOf="@id/poster"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/rating" />
+
+    <TextView
+        android:id="@+id/overview"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="22dp"
+        android:layout_marginTop="4dp"
+        app:layout_constraintLeft_toRightOf="@id/poster"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/overview_label"
+        tools:text="@tools:sample/lorem/random" />
+
+</android.support.constraint.ConstraintLayout>
