@@ -22,7 +22,8 @@
         <activity
             android:name=".ui.MovieDetailActivity"
             android:label="@string/title_movie_detail"
-            android:parentActivityName=".ui.MainActivity" />
+            android:parentActivityName=".ui.MainActivity"
+            android:launchMode="singleTop"/>
     </application>
 
 </manifest>

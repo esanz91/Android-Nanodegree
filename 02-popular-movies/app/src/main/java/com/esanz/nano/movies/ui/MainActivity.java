@@ -49,9 +49,10 @@ public class MainActivity extends AppCompatActivity
         Intent movieDetailIntent = MovieDetailActivity.createIntent(this, movie);
 
         // TODO add and perfect animation
-        ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(
+        /*ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(
                 this, moviePosterTransition);
+        startActivity(movieDetailIntent, options.toBundle());*/
 
-        startActivity(movieDetailIntent, options.toBundle());
+        startActivity(movieDetailIntent);
     }
 }
