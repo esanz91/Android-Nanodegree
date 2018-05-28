@@ -4,6 +4,6 @@
     <color name="colorPrimaryDark">#004c8c</color>
     <color name="colorAccent">#58a5f0</color>
 
-    <color name="secondaryDark25">#40002171</color>
+    <color name="primaryDark25">#40004c8c</color>
     <color name="black80">#99000000</color>
 </resources>

@@ -3,13 +3,23 @@ package com.esanz.nano.movies.repository.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.esanz.nano.movies.utils.MovieDateUtils;
 import com.google.gson.annotations.SerializedName;
 
+import java.text.SimpleDateFormat;
+import java.util.Locale;
+
 public class Movie implements Parcelable {
+
+    public static final int MAX_RATING = 10;
 
     private static final String IMAGE_SECURE_BASE_URL = "https://image.tmdb.org/t/p/";
     private static final String POSTER_SIZE_PATH = "w342";
     private static final String BACKDROP_SIZE_PATH = "w780";
+    private static final SimpleDateFormat RELEASE_DATE_INPUT_FORMAT =
+            new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+    private static final SimpleDateFormat RELEASE_DATE_OUTPUT_FORMAT =
+            new SimpleDateFormat("MMMM dd, yyyy", Locale.US);
 
     @SerializedName("id")
     public int id;
@@ -84,6 +94,10 @@ public class Movie implements Parcelable {
 
     public String getPosterUrlString() {
         return IMAGE_SECURE_BASE_URL + POSTER_SIZE_PATH + posterPath;
+    }
+
+    public String getReleaseDate() {
+        return MovieDateUtils.reformatDateString(releaseDate, RELEASE_DATE_INPUT_FORMAT, RELEASE_DATE_OUTPUT_FORMAT);
     }
 
 }
