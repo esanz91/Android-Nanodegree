@@ -28,6 +28,7 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "com.android.support:appcompat-v7:$versions.androidSupport"
+    implementation "com.android.support:cardview-v7:$versions.androidSupport"
     implementation "com.android.support:design:$versions.androidSupport"
     implementation "com.android.support:recyclerview-v7:$versions.androidSupport"
     implementation "com.android.support.constraint:constraint-layout:$versions.constraintLayout"
@@ -36,16 +37,17 @@ dependencies {
     implementation "android.arch.lifecycle:runtime:$versions.archLifecycle"
     implementation "android.arch.lifecycle:common-java8:$versions.archLifecycle"
 
-    implementation "com.squareup.picasso:picasso:$versions.picasso"
-
+    implementation "com.google.code.gson:gson:$versions.gson"
+    implementation "com.squareup.okhttp3:okhttp:$versions.okhttp"
     implementation "com.squareup.retrofit2:retrofit:$versions.retrofit"
     implementation "com.squareup.retrofit2:converter-gson:$versions.retrofit"
     implementation "com.squareup.retrofit2:adapter-rxjava2:$versions.retrofit"
-    implementation "com.squareup.okhttp3:okhttp:$versions.okhttp"
-    implementation "com.google.code.gson:gson:$versions.gson"
-
     implementation "io.reactivex.rxjava2:rxjava:$versions.rxJava2"
     implementation "io.reactivex.rxjava2:rxandroid:$versions.rxAndroid2"
+
+    implementation "com.jakewharton:butterknife:$versions.butterknife"
+    annotationProcessor "com.jakewharton:butterknife-compiler:$versions.butterknife"
+    implementation "com.squareup.picasso:picasso:$versions.picasso"
 
     testImplementation "junit:junit:$versions.junit"
     androidTestImplementation "com.android.support.test:runner:$versions.runner"
