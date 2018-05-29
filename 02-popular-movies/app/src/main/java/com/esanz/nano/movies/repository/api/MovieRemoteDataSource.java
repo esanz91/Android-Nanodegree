@@ -40,7 +40,7 @@ public class MovieRemoteDataSource implements MovieDataSource {
 
                     @Override
                     public void onError(Throwable e) {
-
+                        callback.onMoviesNotAvailable();
                     }
 
                 });
@@ -59,7 +59,7 @@ public class MovieRemoteDataSource implements MovieDataSource {
 
                     @Override
                     public void onError(Throwable e) {
-
+                        callback.onMoviesNotAvailable();
                     }
                 });
     }

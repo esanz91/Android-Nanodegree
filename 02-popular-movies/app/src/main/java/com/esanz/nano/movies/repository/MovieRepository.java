@@ -46,7 +46,7 @@ public class MovieRepository {
 
             @Override
             public void onMoviesNotAvailable() {
-
+                callback.onMoviesNotAvailable();
             }
         });
     }
@@ -72,7 +72,7 @@ public class MovieRepository {
 
             @Override
             public void onMoviesNotAvailable() {
-
+                callback.onMoviesNotAvailable();
             }
         });
     }

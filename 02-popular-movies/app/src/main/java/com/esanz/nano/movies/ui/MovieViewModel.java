@@ -43,7 +43,7 @@ public class MovieViewModel extends ViewModel {
 
                 @Override
                 public void onMoviesNotAvailable() {
-
+                    movieListLiveData.postValue(null);
                 }
             });
         } else {
@@ -66,7 +66,7 @@ public class MovieViewModel extends ViewModel {
 
                 @Override
                 public void onMoviesNotAvailable() {
-
+                    movieListLiveData.postValue(null);
                 }
             });
         } else {
