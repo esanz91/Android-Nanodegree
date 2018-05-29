@@ -3,6 +3,10 @@
 
     <string name="title_movie_detail">Movie Detail</string>
 
+    <string name="nav_sort_by">Sort By</string>
+    <string name="nav_rating">Highest Rating</string>
+    <string name="nav_popularity">Popularity</string>
+
     <string name="label_release_date">Release Date</string>
     <string name="label_rating">Rating</string>
     <string name="label_overview">Overview</string>

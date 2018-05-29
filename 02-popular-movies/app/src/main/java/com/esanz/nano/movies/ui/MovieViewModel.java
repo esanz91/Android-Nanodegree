@@ -7,29 +7,37 @@ import android.support.annotation.Nullable;
 
 import com.esanz.nano.movies.repository.MovieDataSource;
 import com.esanz.nano.movies.repository.MovieRepository;
-import com.esanz.nano.movies.repository.model.TopRatedResponse;
+import com.esanz.nano.movies.repository.model.PaginatedMovieResponse;
+import com.esanz.nano.movies.utils.MovieConstant;
 
 import java.util.Objects;
 
 public class MovieViewModel extends ViewModel {
 
+    public final MutableLiveData<PaginatedMovieResponse> movieListLiveDate = new MutableLiveData<>();
+
+    private final MutableLiveData<PaginatedMovieResponse> topRatedLiveData = new MutableLiveData<>();
+    private final MutableLiveData<PaginatedMovieResponse> popularLiveData = new MutableLiveData<>();
+
     private final MovieRepository movieRepository;
 
-    public final MutableLiveData<TopRatedResponse> topRatedLiveData = new MutableLiveData<>();
+    private int sortType = MovieConstant.SortType.RATING;
 
     public MovieViewModel(@NonNull final MovieRepository movieRepository) {
         this.movieRepository = Objects.requireNonNull(movieRepository);
     }
 
     public void loadTopRatedMovies() {
+        sortType = MovieConstant.SortType.RATING;
         if (null == topRatedLiveData.getValue()) {
 
             // TODO make use of CompositeDisposable
-            movieRepository.getTopRatedMovies(new MovieDataSource.LoadTopRatedMoviesCallback() {
+            movieRepository.getTopRatedMovies(new MovieDataSource.LoadMoviesCallback() {
                 @Override
-                public void onTopRatedMoviesLoaded(@Nullable final TopRatedResponse response) {
+                public void onMoviesLoaded(@Nullable final PaginatedMovieResponse response) {
                     if (null != response) {
                         topRatedLiveData.postValue(response);
+                        movieListLiveDate.postValue(response);
                     }
                 }
 
@@ -38,7 +46,36 @@ public class MovieViewModel extends ViewModel {
 
                 }
             });
+        } else {
+            movieListLiveDate.postValue(topRatedLiveData.getValue());
         }
     }
 
+    public void loadPopularMovies() {
+        sortType = MovieConstant.SortType.POPULARITY;
+        if (null == popularLiveData.getValue()) {
+
+            movieRepository.getPopularMovies(new MovieDataSource.LoadMoviesCallback() {
+                @Override
+                public void onMoviesLoaded(@Nullable PaginatedMovieResponse response) {
+                    if (null != response) {
+                        popularLiveData.postValue(response);
+                        movieListLiveDate.postValue(response);
+                    }
+                }
+
+                @Override
+                public void onMoviesNotAvailable() {
+
+                }
+            });
+        } else {
+            movieListLiveDate.postValue(popularLiveData.getValue());
+        }
+    }
+
+    @MovieConstant.SortTypeDef
+    public int getSortType() {
+        return sortType;
+    }
 }

@@ -4,7 +4,7 @@ import android.support.annotation.NonNull;
 
 import com.esanz.nano.movies.MovieApplication;
 import com.esanz.nano.movies.repository.MovieDataSource;
-import com.esanz.nano.movies.repository.model.TopRatedResponse;
+import com.esanz.nano.movies.repository.model.PaginatedMovieResponse;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.observers.DisposableSingleObserver;
@@ -26,16 +26,16 @@ public class MovieRemoteDataSource implements MovieDataSource {
     }
 
     @Override
-    public void getTopRatedMovies(@NonNull final LoadTopRatedMoviesCallback callback) {
+    public void getTopRatedMovies(@NonNull final LoadMoviesCallback callback) {
         // TODO make Result Wrapper to handle errors
         MovieApplication.movieApi.getTopRated()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new DisposableSingleObserver<TopRatedResponse>() {
+                .subscribe(new DisposableSingleObserver<PaginatedMovieResponse>() {
 
                     @Override
-                    public void onSuccess(TopRatedResponse topRatedResponse) {
-                        callback.onTopRatedMoviesLoaded(topRatedResponse);
+                    public void onSuccess(PaginatedMovieResponse paginatedMovieResponse) {
+                        callback.onMoviesLoaded(paginatedMovieResponse);
                     }
 
                     @Override
@@ -43,6 +43,24 @@ public class MovieRemoteDataSource implements MovieDataSource {
 
                     }
 
+                });
+    }
+
+    @Override
+    public void getPopularMovies(@NonNull LoadMoviesCallback callback) {
+        MovieApplication.movieApi.getPopular()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new DisposableSingleObserver<PaginatedMovieResponse>() {
+                    @Override
+                    public void onSuccess(PaginatedMovieResponse paginatedMovieResponse) {
+                        callback.onMoviesLoaded(paginatedMovieResponse);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
                 });
     }
 
