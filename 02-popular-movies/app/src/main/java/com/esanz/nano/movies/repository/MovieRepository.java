@@ -3,7 +3,7 @@ package com.esanz.nano.movies.repository;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.esanz.nano.movies.repository.model.TopRatedResponse;
+import com.esanz.nano.movies.repository.model.PaginatedMovieResponse;
 
 import java.util.Objects;
 
@@ -25,7 +25,7 @@ public class MovieRepository {
         return INSTANCE;
     }
 
-    public void getTopRatedMovies(@NonNull final MovieDataSource.LoadTopRatedMoviesCallback callback) {
+    public void getTopRatedMovies(@NonNull final MovieDataSource.LoadMoviesCallback callback) {
         // TODO attempt to fetch from cache
         // TODO if cache is "dirty", fetch from remote
         // TODO if no cache, attempt to fetch from local DB, fallback to fetch from remote
@@ -34,14 +34,40 @@ public class MovieRepository {
         getTopRatedMoviesFromRemote(callback);
     }
 
-    private void getTopRatedMoviesFromRemote(@NonNull final MovieDataSource.LoadTopRatedMoviesCallback callback) {
-        movieRemoteDataSource.getTopRatedMovies(new MovieDataSource.LoadTopRatedMoviesCallback() {
+    private void getTopRatedMoviesFromRemote(@NonNull final MovieDataSource.LoadMoviesCallback callback) {
+        movieRemoteDataSource.getTopRatedMovies(new MovieDataSource.LoadMoviesCallback() {
             @Override
-            public void onTopRatedMoviesLoaded(@Nullable final TopRatedResponse response) {
+            public void onMoviesLoaded(@Nullable final PaginatedMovieResponse response) {
                 // TODO refresh cache
                 // TODO refresh local DB
 
-                callback.onTopRatedMoviesLoaded(response);
+                callback.onMoviesLoaded(response);
+            }
+
+            @Override
+            public void onMoviesNotAvailable() {
+
+            }
+        });
+    }
+
+    public void getPopularMovies(@NonNull final MovieDataSource.LoadMoviesCallback callback) {
+        // TODO attempt to fetch from cache
+        // TODO if cache is "dirty", fetch from remote
+        // TODO if no cache, attempt to fetch from local DB, fallback to fetch from remote
+
+        // for now always fetch from remote
+        getPopularMoviesFromRemote(callback);
+    }
+
+    private void getPopularMoviesFromRemote(@NonNull final MovieDataSource.LoadMoviesCallback callback) {
+        movieRemoteDataSource.getPopularMovies(new MovieDataSource.LoadMoviesCallback() {
+            @Override
+            public void onMoviesLoaded(@Nullable PaginatedMovieResponse response) {
+                // TODO refresh cache
+                // TODO refresh local DB
+
+                callback.onMoviesLoaded(response);
             }
 
             @Override

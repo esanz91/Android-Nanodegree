@@ -1,6 +1,6 @@
 package com.esanz.nano.movies.repository.api;
 
-import com.esanz.nano.movies.repository.model.TopRatedResponse;
+import com.esanz.nano.movies.repository.model.PaginatedMovieResponse;
 
 import io.reactivex.Single;
 import retrofit2.http.GET;
@@ -8,6 +8,9 @@ import retrofit2.http.GET;
 public interface MovieApi {
 
     @GET("movie/top_rated")
-    Single<TopRatedResponse> getTopRated();
+    Single<PaginatedMovieResponse> getTopRated();
+
+    @GET("movie/popular")
+    Single<PaginatedMovieResponse> getPopular();
 
 }
