@@ -14,7 +14,7 @@ import java.util.Objects;
 
 public class MovieViewModel extends ViewModel {
 
-    public final MutableLiveData<PaginatedMovieResponse> movieListLiveDate = new MutableLiveData<>();
+    public final MutableLiveData<PaginatedMovieResponse> movieListLiveData = new MutableLiveData<>();
 
     private final MutableLiveData<PaginatedMovieResponse> topRatedLiveData = new MutableLiveData<>();
     private final MutableLiveData<PaginatedMovieResponse> popularLiveData = new MutableLiveData<>();
@@ -37,7 +37,7 @@ public class MovieViewModel extends ViewModel {
                 public void onMoviesLoaded(@Nullable final PaginatedMovieResponse response) {
                     if (null != response) {
                         topRatedLiveData.postValue(response);
-                        movieListLiveDate.postValue(response);
+                        movieListLiveData.postValue(response);
                     }
                 }
 
@@ -47,7 +47,7 @@ public class MovieViewModel extends ViewModel {
                 }
             });
         } else {
-            movieListLiveDate.postValue(topRatedLiveData.getValue());
+            movieListLiveData.postValue(topRatedLiveData.getValue());
         }
     }
 
@@ -60,7 +60,7 @@ public class MovieViewModel extends ViewModel {
                 public void onMoviesLoaded(@Nullable PaginatedMovieResponse response) {
                     if (null != response) {
                         popularLiveData.postValue(response);
-                        movieListLiveDate.postValue(response);
+                        movieListLiveData.postValue(response);
                     }
                 }
 
@@ -70,7 +70,7 @@ public class MovieViewModel extends ViewModel {
                 }
             });
         } else {
-            movieListLiveDate.postValue(popularLiveData.getValue());
+            movieListLiveData.postValue(popularLiveData.getValue());
         }
     }
 
