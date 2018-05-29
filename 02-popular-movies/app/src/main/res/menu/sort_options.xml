@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item
-        android:id="@+id/sort_by_rating"
-        android:title="@string/nav_rating" />
-    <item
-        android:id="@+id/sort_by_popularity"
-        android:title="@string/nav_popularity" />
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/sort_by_rating"
+            android:title="@string/nav_rating"
+            tools:checked="true" />
+        <item
+            android:id="@+id/sort_by_popularity"
+            android:title="@string/nav_popularity" />
+    </group>
 </menu>

@@ -24,6 +24,7 @@ public class MainActivity extends AppCompatActivity
 
     private MovieViewModel movieViewModel;
 
+    private PopupMenu popupMenu;
     private RecyclerView movieView;
 
     @Override
@@ -76,6 +77,15 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
+    protected void onPause() {
+        if (null != popupMenu) {
+            popupMenu.dismiss();
+            popupMenu = null;
+        }
+        super.onPause();
+    }
+
+    @Override
     public void onMoviePosterClick(Movie movie, Pair<View, String> moviePosterTransition) {
         Intent movieDetailIntent = MovieDetailActivity.createIntent(this, movie);
 
@@ -89,9 +99,10 @@ public class MainActivity extends AppCompatActivity
 
     private void showSortByPopupMenu() {
         View menuItem = findViewById(R.id.sort_by);
-        PopupMenu popupMenu = new PopupMenu(this, menuItem);
+        popupMenu = new PopupMenu(this, menuItem);
         popupMenu.inflate(R.menu.sort_options);
         popupMenu.setOnMenuItemClickListener(item -> {
+            item.setChecked(true);
             switch (item.getItemId()) {
                 case R.id.sort_by_rating:
                     movieViewModel.loadTopRatedMovies();
@@ -102,6 +113,17 @@ public class MainActivity extends AppCompatActivity
             }
             return false;
         });
+
+        @MovieConstant.SortTypeDef int sortType = movieViewModel.getSortType();
+        switch (sortType) {
+            case MovieConstant.SortType.RATING:
+                popupMenu.getMenu().findItem(R.id.sort_by_rating).setChecked(true);
+                break;
+            case MovieConstant.SortType.POPULARITY:
+                popupMenu.getMenu().findItem(R.id.sort_by_popularity).setChecked(true);
+                break;
+        }
+
         popupMenu.show();
     }
 }

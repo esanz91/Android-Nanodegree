@@ -3,6 +3,8 @@ package com.esanz.nano.movies.ui;
 import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -20,6 +22,9 @@ import butterknife.ButterKnife;
 public class MovieDetailActivity extends AppCompatActivity {
 
     private static final String EXTRA_MOVIE = "movie";
+
+    @BindView(R.id.collapsing_toolbar)
+    CollapsingToolbarLayout collapsingToolbar;
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -56,6 +61,8 @@ public class MovieDetailActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         bindMovie(getIntent().getParcelableExtra(EXTRA_MOVIE));
     }
 
@@ -70,7 +77,7 @@ public class MovieDetailActivity extends AppCompatActivity {
     }
 
     private void bindMovie(@NonNull final Movie movie) {
-        getSupportActionBar().setTitle(movie.title);
+        collapsingToolbar.setTitle(movie.title);
         Picasso.with(this)
                 .load(movie.getBackdropUrlString())
                 .into(backdropView);
