@@ -26,6 +26,7 @@ public class MainActivity extends AppCompatActivity
 
     private PopupMenu popupMenu;
     private RecyclerView movieView;
+    private View emptyStateView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +34,7 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         setSupportActionBar(findViewById(R.id.toolbar));
 
+        emptyStateView = findViewById(R.id.empty_state);
         movieView = findViewById(R.id.movies);
         movieView.setAdapter(movieAdapter);
 
@@ -54,8 +56,13 @@ public class MainActivity extends AppCompatActivity
 
         movieViewModel.movieListLiveData
                 .observe(this, movieList -> {
-                    if (null != movieList) {
+                    if (null != movieList && null != movieList.movies && !movieList.movies.isEmpty()) {
                         movieAdapter.setMovies(movieList.movies);
+                        emptyStateView.setVisibility(View.GONE);
+                        movieView.setVisibility(View.VISIBLE);
+                    } else {
+                        emptyStateView.setVisibility(View.VISIBLE);
+                        movieView.setVisibility(View.GONE);
                     }
                 });
     }
