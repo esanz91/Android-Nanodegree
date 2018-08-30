@@ -12,16 +12,19 @@ import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.esanz.nano.movies.MovieApplication;
 import com.esanz.nano.movies.R;
 import com.esanz.nano.movies.repository.model.Movie;
 import com.squareup.picasso.Picasso;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 public class MovieDetailActivity extends AppCompatActivity {
 
-    private static final String EXTRA_MOVIE = "movie";
+    private static final String EXTRA_MOVIE_ID = "movie_id";
 
     @BindView(R.id.collapsing_toolbar)
     CollapsingToolbarLayout collapsingToolbar;
@@ -47,10 +50,9 @@ public class MovieDetailActivity extends AppCompatActivity {
     @BindView(R.id.overview)
     TextView overviewView;
 
-    // TODO store movies in Room and just pass in the id
     public static Intent createIntent(@NonNull final Context context, @NonNull final Movie movie) {
         Intent intent = new Intent(context, MovieDetailActivity.class);
-        intent.putExtra(EXTRA_MOVIE, movie);
+        intent.putExtra(EXTRA_MOVIE_ID, movie.id);
         return intent;
     }
 
@@ -63,7 +65,13 @@ public class MovieDetailActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        bindMovie(getIntent().getParcelableExtra(EXTRA_MOVIE));
+        int movieId = getIntent().getIntExtra(EXTRA_MOVIE_ID, -1);
+        if (movieId != -1) {
+            MovieApplication.movieDatabase.moviesDao().findById(movieId)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(this::bindMovie);
+        }
     }
 
     @Override

@@ -26,11 +26,6 @@ public class MovieRepository {
     }
 
     public void getTopRatedMovies(@NonNull final MovieDataSource.LoadMoviesCallback callback) {
-        // TODO attempt to fetch from cache
-        // TODO if cache is "dirty", fetch from remote
-        // TODO if no cache, attempt to fetch from local DB, fallback to fetch from remote
-
-        // for now always fetch from remote
         getTopRatedMoviesFromRemote(callback);
     }
 
@@ -38,9 +33,6 @@ public class MovieRepository {
         movieRemoteDataSource.getTopRatedMovies(new MovieDataSource.LoadMoviesCallback() {
             @Override
             public void onMoviesLoaded(@Nullable final PaginatedMovieResponse response) {
-                // TODO refresh cache
-                // TODO refresh local DB
-
                 callback.onMoviesLoaded(response);
             }
 
@@ -52,7 +44,6 @@ public class MovieRepository {
     }
 
     public void getPopularMovies(@NonNull final MovieDataSource.LoadMoviesCallback callback) {
-        // TODO attempt to fetch from cache
         // TODO if cache is "dirty", fetch from remote
         // TODO if no cache, attempt to fetch from local DB, fallback to fetch from remote
 

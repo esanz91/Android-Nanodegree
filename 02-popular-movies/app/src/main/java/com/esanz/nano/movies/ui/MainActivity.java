@@ -39,7 +39,9 @@ public class MainActivity extends AppCompatActivity
         movieView.setAdapter(movieAdapter);
 
         // TODO use dagger injection
-        MovieRepository movieRepository = MovieRepository.getInstance(MovieRemoteDataSource.getInstance());
+        MovieRepository movieRepository = MovieRepository.getInstance(
+                MovieRemoteDataSource.getInstance()
+        );
         ViewModelFactory movieFactory = new ViewModelFactory(movieRepository);
 
         movieViewModel = ViewModelProviders.of(this, movieFactory).get(MovieViewModel.class);

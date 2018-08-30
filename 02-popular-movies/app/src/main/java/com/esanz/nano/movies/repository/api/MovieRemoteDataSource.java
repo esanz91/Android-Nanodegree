@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 
 import com.esanz.nano.movies.MovieApplication;
 import com.esanz.nano.movies.repository.MovieDataSource;
+import com.esanz.nano.movies.repository.model.Movie;
 import com.esanz.nano.movies.repository.model.PaginatedMovieResponse;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -30,6 +31,12 @@ public class MovieRemoteDataSource implements MovieDataSource {
         // TODO make Result Wrapper to handle errors
         MovieApplication.movieApi.getTopRated()
                 .subscribeOn(Schedulers.io())
+                .doOnSuccess(response -> {
+                    Movie[] movies = response.movies.toArray(new Movie[response.movies.size()]);
+
+                    // add movies
+                    MovieApplication.movieDatabase.moviesDao().insertAll(movies);
+                })
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new DisposableSingleObserver<PaginatedMovieResponse>() {
 
