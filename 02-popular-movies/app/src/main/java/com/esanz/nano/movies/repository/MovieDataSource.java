@@ -19,4 +19,5 @@ public interface MovieDataSource {
     void getTopRatedMovies(@NonNull final LoadMoviesCallback callback);
 
     void getPopularMovies(@NonNull final LoadMoviesCallback callback);
+
 }

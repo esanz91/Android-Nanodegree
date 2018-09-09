@@ -9,10 +9,10 @@ public class PaginatedMovieResponse {
     @SerializedName("page")
     public int page;
 
-    @SerializedName("total_pages")
-    public int totalPages;
-
     @SerializedName("results")
     public List<Movie> movies;
 
+    public PaginatedMovieResponse(List<Movie> movies) {
+        this.movies = movies;
+    }
 }

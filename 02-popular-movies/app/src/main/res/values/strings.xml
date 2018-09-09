@@ -6,6 +6,7 @@
     <string name="nav_sort_by">Sort By</string>
     <string name="nav_rating">Top Rating</string>
     <string name="nav_popularity">Most Popular</string>
+    <string name="nav_favorites">Favorites</string>
 
     <string name="label_release_date">Release Date</string>
     <string name="label_rating">Rating</string>
