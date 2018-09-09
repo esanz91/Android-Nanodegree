@@ -2,6 +2,7 @@ package com.esanz.nano.movies.repository.api;
 
 import android.support.annotation.NonNull;
 
+import com.esanz.nano.movies.repository.model.MovieVideoResponse;
 import com.esanz.nano.movies.repository.model.PaginatedMovieResponse;
 import com.esanz.nano.movies.repository.model.PaginatedMovieReviewResponse;
 
@@ -35,8 +36,14 @@ public class MovieRemoteDataSource {
                 .subscribeOn(Schedulers.io());
     }
 
+    public Single<MovieVideoResponse> getMovieVideos(int movieId) {
+        return movieApi.getVideos(movieId)
+                .subscribeOn(Schedulers.io());
+    }
+
     public Single<PaginatedMovieReviewResponse> getMovieReviews(int movieId) {
         return movieApi.getReviews(movieId)
                 .subscribeOn(Schedulers.io());
     }
+
 }

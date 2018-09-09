@@ -7,8 +7,11 @@ import android.support.annotation.NonNull;
 import com.esanz.nano.movies.repository.MovieRepository;
 import com.esanz.nano.movies.repository.model.Movie;
 import com.esanz.nano.movies.repository.model.MovieDetail;
+import com.esanz.nano.movies.repository.model.MovieVideo;
 
 import java.util.Objects;
+
+import io.reactivex.Observable;
 
 public class MovieDetailsViewModel extends ViewModel {
 
@@ -23,6 +26,12 @@ public class MovieDetailsViewModel extends ViewModel {
     public void loadMovieDetails(int movieId) {
         if (null == movieDetailsLiveData.getValue()) {
             movieRepository.getMovieDetailsById(movieId)
+                    .doOnSuccess(details ->
+                            details.videos = Observable.just(details.videos)
+                                    .flatMapIterable(videos -> videos)
+                                    .filter(video -> video.site.equalsIgnoreCase(MovieVideo.SITE_YOUTUBE))
+                                    .toList()
+                                    .blockingGet())
                     .subscribe(movieDetailsLiveData::postValue);
         }
     }
