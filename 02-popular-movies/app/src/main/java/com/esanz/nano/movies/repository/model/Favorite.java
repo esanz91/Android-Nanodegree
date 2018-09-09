@@ -10,11 +10,15 @@ public class Favorite {
 
     public static final String TABLE_NAME = "favorites";
     public static final String COLUMN_ID = "id";
+    public static final String COLUMN_MOVIE_ID = "movie_id";
 
     @PrimaryKey(autoGenerate = true)
     public int id;
 
-    @ColumnInfo(name = "movie_id")
+    @ColumnInfo(name = COLUMN_MOVIE_ID)
     public int movieId;
 
+    public Favorite(int movieId) {
+        this.movieId = movieId;
+    }
 }

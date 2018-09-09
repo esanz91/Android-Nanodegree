@@ -2,9 +2,8 @@ package com.esanz.nano.movies.ui;
 
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
-import android.support.v4.util.Pair;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
@@ -19,6 +18,8 @@ import com.esanz.nano.movies.utils.MovieConstant;
 
 public class MainActivity extends AppCompatActivity
         implements MovieAdapter.OnMovieClickListener {
+
+    private static final int REQUEST_DETAILS = 1;
 
     private final MovieAdapter movieAdapter = new MovieAdapter(this);
 
@@ -54,12 +55,14 @@ public class MainActivity extends AppCompatActivity
             case MovieConstant.SortType.POPULARITY:
                 movieViewModel.loadPopularMovies();
                 break;
+            case MovieConstant.SortType.FAVORITES:
+                movieViewModel.loadFavoriteMovies();
         }
 
         movieViewModel.movieListLiveData
                 .observe(this, movieList -> {
-                    if (null != movieList && null != movieList.movies && !movieList.movies.isEmpty()) {
-                        movieAdapter.setMovies(movieList.movies);
+                    if (null != movieList && !movieList.isEmpty()) {
+                        movieAdapter.setMovies(movieList);
                         emptyStateView.setVisibility(View.GONE);
                         movieView.setVisibility(View.VISIBLE);
                     } else {
@@ -86,6 +89,15 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == REQUEST_DETAILS && resultCode == MovieDetailActivity.RESULT_RELOAD_FAVORITES) {
+            movieViewModel.loadFavoriteMovies();
+        }
+    }
+
+    @Override
     protected void onPause() {
         if (null != popupMenu) {
             popupMenu.dismiss();
@@ -95,15 +107,18 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onMoviePosterClick(Movie movie, Pair<View, String> moviePosterTransition) {
+    public void onMoviePosterClick(Movie movie) {
         Intent movieDetailIntent = MovieDetailActivity.createIntent(this, movie);
+        startActivityForResult(movieDetailIntent, REQUEST_DETAILS);
+    }
 
-        // TODO add and perfect animation
-        /*ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(
-                this, moviePosterTransition);
-        startActivity(movieDetailIntent, options.toBundle());*/
-
-        startActivity(movieDetailIntent);
+    @Override
+    public void onFavoriteClick(Movie movie, boolean isFavorite) {
+        if (isFavorite) {
+            movieViewModel.addFavorite(movie);
+        } else {
+            movieViewModel.removeFavorite(movie);
+        }
     }
 
     private void showSortByPopupMenu() {
@@ -119,6 +134,9 @@ public class MainActivity extends AppCompatActivity
                 case R.id.sort_by_popularity:
                     movieViewModel.loadPopularMovies();
                     return true;
+                case R.id.sort_by_favorite:
+                    movieViewModel.loadFavoriteMovies();
+                    return true;
             }
             return false;
         });
@@ -130,6 +148,9 @@ public class MainActivity extends AppCompatActivity
                 break;
             case MovieConstant.SortType.POPULARITY:
                 popupMenu.getMenu().findItem(R.id.sort_by_popularity).setChecked(true);
+                break;
+            case MovieConstant.SortType.FAVORITES:
+                popupMenu.getMenu().findItem(R.id.sort_by_favorite).setChecked(true);
                 break;
         }
 

@@ -33,8 +33,6 @@ public class MovieRemoteDataSource implements MovieDataSource {
                 .subscribeOn(Schedulers.io())
                 .doOnSuccess(response -> {
                     Movie[] movies = response.movies.toArray(new Movie[response.movies.size()]);
-
-                    // add movies
                     MovieApplication.movieDatabase.moviesDao().insertAll(movies);
                 })
                 .observeOn(AndroidSchedulers.mainThread())
@@ -57,6 +55,10 @@ public class MovieRemoteDataSource implements MovieDataSource {
     public void getPopularMovies(@NonNull LoadMoviesCallback callback) {
         MovieApplication.movieApi.getPopular()
                 .subscribeOn(Schedulers.io())
+                .doOnSuccess(response -> {
+                    Movie[] movies = response.movies.toArray(new Movie[response.movies.size()]);
+                    MovieApplication.movieDatabase.moviesDao().insertAll(movies);
+                })
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new DisposableSingleObserver<PaginatedMovieResponse>() {
                     @Override

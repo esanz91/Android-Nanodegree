@@ -7,6 +7,8 @@ import android.arch.persistence.room.Query;
 
 import com.esanz.nano.movies.repository.model.Movie;
 
+import java.util.List;
+
 import io.reactivex.Maybe;
 
 @Dao
@@ -17,5 +19,8 @@ public interface MovieDao {
 
     @Query("SELECT * FROM " + Movie.TABLE_NAME + " WHERE " + Movie.COLUMN_ID + " = :id")
     Maybe<Movie> findById(int id);
+
+    @Query("SELECT * FROM " + Movie.TABLE_NAME + " WHERE " + Movie.COLUMN_ID + " IN(:ids)")
+    Maybe<List<Movie>> findByIds(List<Integer> ids);
 
 }
