@@ -1,4 +1,4 @@
-package com.esanz.nano.movies.ui;
+package com.esanz.nano.movies.ui.adapter;
 
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
@@ -11,7 +11,6 @@ import android.widget.ImageView;
 import com.esanz.nano.movies.R;
 import com.esanz.nano.movies.repository.model.Movie;
 import com.esanz.nano.movies.ui.widget.CheckableFloatingActionButton;
-import com.esanz.nano.movies.ui.widget.SimpleViewHolder;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -24,9 +23,6 @@ public class MovieAdapter extends RecyclerView.Adapter<SimpleViewHolder> {
         void onFavoriteClick(Movie movie, boolean isFavorite);
     }
 
-    @LayoutRes
-    private final int layout = R.layout.list_item_poster;
-
     private List<Movie> movies;
     private OnMovieClickListener listener;
 
@@ -38,7 +34,7 @@ public class MovieAdapter extends RecyclerView.Adapter<SimpleViewHolder> {
     @Override
     public SimpleViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
-                .inflate(layout, parent, false);
+                .inflate(R.layout.list_item_poster, parent, false);
         SimpleViewHolder view = new SimpleViewHolder(itemView);
 
         view.onItemClick((v, position) -> listener.onMoviePosterClick(movies.get(position)));

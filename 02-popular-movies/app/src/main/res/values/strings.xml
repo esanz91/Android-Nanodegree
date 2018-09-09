@@ -11,6 +11,9 @@
     <string name="label_release_date">Release Date</string>
     <string name="label_rating">Rating</string>
     <string name="label_overview">Overview</string>
+    <string name="label_reviews">Reviews</string>
+
+    <string name="action_read_more">&lt;a href="%s">Read more&lt;/a></string>
 
     <string name="rating">%1$.1f / %2$d</string>
 

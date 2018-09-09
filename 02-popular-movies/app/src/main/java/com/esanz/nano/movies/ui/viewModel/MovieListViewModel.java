@@ -1,14 +1,10 @@
-package com.esanz.nano.movies.ui;
+package com.esanz.nano.movies.ui.viewModel;
 
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
-import com.esanz.nano.movies.MovieApplication;
-import com.esanz.nano.movies.repository.MovieDataSource;
 import com.esanz.nano.movies.repository.MovieRepository;
-import com.esanz.nano.movies.repository.dao.FavoriteDao;
 import com.esanz.nano.movies.repository.model.Movie;
 import com.esanz.nano.movies.repository.model.PaginatedMovieResponse;
 import com.esanz.nano.movies.utils.MovieConstant;
@@ -16,7 +12,7 @@ import com.esanz.nano.movies.utils.MovieConstant;
 import java.util.List;
 import java.util.Objects;
 
-public class MovieViewModel extends ViewModel {
+public class MovieListViewModel extends ViewModel {
 
     public final MutableLiveData<List<Movie>> movieListLiveData = new MutableLiveData<>();
 
@@ -27,7 +23,9 @@ public class MovieViewModel extends ViewModel {
 
     private int sortType = MovieConstant.SortType.RATING;
 
-    public MovieViewModel(@NonNull final MovieRepository movieRepository) {
+    // TODO make use of CompositeDisposable
+
+    public MovieListViewModel(@NonNull final MovieRepository movieRepository) {
         this.movieRepository = Objects.requireNonNull(movieRepository);
     }
 
@@ -35,21 +33,11 @@ public class MovieViewModel extends ViewModel {
         sortType = MovieConstant.SortType.RATING;
         if (null == topRatedLiveData.getValue()) {
 
-            // TODO make use of CompositeDisposable
-            movieRepository.getTopRatedMovies(new MovieDataSource.LoadMoviesCallback() {
-                @Override
-                public void onMoviesLoaded(@Nullable final PaginatedMovieResponse response) {
-                    if (null != response) {
+            movieRepository.getTopRatedMovies()
+                    .subscribe(response -> {
                         topRatedLiveData.postValue(response);
                         movieListLiveData.postValue(response.movies);
-                    }
-                }
-
-                @Override
-                public void onMoviesNotAvailable() {
-                    movieListLiveData.postValue(null);
-                }
-            });
+                    }, e -> movieListLiveData.postValue(null));
         } else {
             movieListLiveData.postValue(topRatedLiveData.getValue().movies);
         }
@@ -58,21 +46,11 @@ public class MovieViewModel extends ViewModel {
     public void loadPopularMovies() {
         sortType = MovieConstant.SortType.POPULARITY;
         if (null == popularLiveData.getValue()) {
-
-            movieRepository.getPopularMovies(new MovieDataSource.LoadMoviesCallback() {
-                @Override
-                public void onMoviesLoaded(@Nullable PaginatedMovieResponse response) {
-                    if (null != response) {
+            movieRepository.getPopularMovies()
+                    .subscribe(response -> {
                         popularLiveData.postValue(response);
                         movieListLiveData.postValue(response.movies);
-                    }
-                }
-
-                @Override
-                public void onMoviesNotAvailable() {
-                    movieListLiveData.postValue(null);
-                }
-            });
+                    }, e -> movieListLiveData.postValue(null));
         } else {
             movieListLiveData.postValue(popularLiveData.getValue().movies);
         }
@@ -81,26 +59,17 @@ public class MovieViewModel extends ViewModel {
     public void loadFavoriteMovies() {
         sortType = MovieConstant.SortType.FAVORITES;
 
-        movieRepository.getFavoriteMovies(new MovieDataSource.LoadMoviesCallback() {
-            @Override
-            public void onMoviesLoaded(@Nullable PaginatedMovieResponse response) {
-                movieListLiveData.postValue(response.movies);
-            }
-
-            @Override
-            public void onMoviesNotAvailable() {
-                movieListLiveData.postValue(null);
-            }
-        });
+        movieRepository.getFavoriteMovies()
+                .subscribe(movieListLiveData::postValue, e -> movieListLiveData.postValue(null));
 
     }
 
     public void addFavorite(Movie movie) {
-        movieRepository.addFavoriteMovie(movie);
+        movieRepository.addFavoriteMovie(movie).subscribe();
     }
 
     public void removeFavorite(Movie movie) {
-        movieRepository.deleteFavoriteMovie(movie);
+        movieRepository.deleteFavoriteMovie(movie).subscribe();
     }
 
     @MovieConstant.SortTypeDef

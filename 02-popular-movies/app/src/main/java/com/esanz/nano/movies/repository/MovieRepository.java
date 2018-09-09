@@ -1,18 +1,26 @@
 package com.esanz.nano.movies.repository;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import android.support.v4.util.Pair;
 
-import com.esanz.nano.movies.MovieApplication;
+import com.esanz.nano.movies.repository.api.MovieRemoteDataSource;
 import com.esanz.nano.movies.repository.dao.FavoriteDao;
 import com.esanz.nano.movies.repository.dao.MovieDao;
 import com.esanz.nano.movies.repository.model.Favorite;
 import com.esanz.nano.movies.repository.model.Movie;
+import com.esanz.nano.movies.repository.model.MovieDetail;
+import com.esanz.nano.movies.repository.model.MovieReview;
 import com.esanz.nano.movies.repository.model.PaginatedMovieResponse;
+import com.esanz.nano.movies.repository.model.PaginatedMovieReviewResponse;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 
+import io.reactivex.Completable;
+import io.reactivex.Maybe;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
@@ -20,81 +28,95 @@ public class MovieRepository {
 
     private static MovieRepository INSTANCE = null;
 
-    private final MovieDataSource movieRemoteDataSource;
-    private final MovieDao movieLocalDataSource;
-    private final FavoriteDao favoriteLocalDataSource;
+    private final MovieRemoteDataSource movieRemoteDataSource;
+    private final MovieDao movieDao;
+    private final FavoriteDao favoriteDao;
 
-    private MovieRepository(@NonNull final MovieDataSource movieRemoteDataSource) {
+    // TODO make use of CompositeDisposable
+
+    private MovieRepository(@NonNull final MovieRemoteDataSource movieRemoteDataSource,
+                            @NonNull final MovieLocalDataSource movieLocalDataSource) {
         this.movieRemoteDataSource = Objects.requireNonNull(movieRemoteDataSource);
-        this.movieLocalDataSource = MovieApplication.movieDatabase.moviesDao();
-        this.favoriteLocalDataSource = MovieApplication.movieDatabase.favoritesDao();
+        this.movieDao = movieLocalDataSource.moviesDao();
+        this.favoriteDao = movieLocalDataSource.favoritesDao();
     }
 
-    public static MovieRepository getInstance(@NonNull final MovieDataSource movieDataSource) {
+    public static MovieRepository getInstance(@NonNull final MovieRemoteDataSource movieRemoteDataSource,
+                                              @NonNull final MovieLocalDataSource movieLocalDataSource) {
         if (null == INSTANCE) {
-            INSTANCE = new MovieRepository(movieDataSource);
+            INSTANCE = new MovieRepository(movieRemoteDataSource, movieLocalDataSource);
         }
 
         return INSTANCE;
     }
 
-    public void getTopRatedMovies(@NonNull final MovieDataSource.LoadMoviesCallback callback) {
-        getTopRatedMoviesFromRemote(callback);
+    public Single<PaginatedMovieResponse> getTopRatedMovies() {
+        return getTopRatedMoviesFromRemote();
     }
 
-    private void getTopRatedMoviesFromRemote(@NonNull final MovieDataSource.LoadMoviesCallback callback) {
-        movieRemoteDataSource.getTopRatedMovies(new MovieDataSource.LoadMoviesCallback() {
-            @Override
-            public void onMoviesLoaded(@Nullable final PaginatedMovieResponse response) {
-                callback.onMoviesLoaded(response);
-            }
-
-            @Override
-            public void onMoviesNotAvailable() {
-                callback.onMoviesNotAvailable();
-            }
-        });
+    private Single<PaginatedMovieResponse> getTopRatedMoviesFromRemote() {
+        return movieRemoteDataSource.getTopRatedMovies()
+                .doOnSuccess(response -> {
+                    Movie[] movies = response.movies.toArray(new Movie[response.movies.size()]);
+                    movieDao.insertAll(movies);
+                })
+                .observeOn(AndroidSchedulers.mainThread());
     }
 
-    public void getPopularMovies(@NonNull final MovieDataSource.LoadMoviesCallback callback) {
+    public Single<PaginatedMovieResponse> getPopularMovies() {
         // for now always fetch from remote
-        getPopularMoviesFromRemote(callback);
+        return getPopularMoviesFromRemote();
     }
 
-    private void getPopularMoviesFromRemote(@NonNull final MovieDataSource.LoadMoviesCallback callback) {
-        movieRemoteDataSource.getPopularMovies(new MovieDataSource.LoadMoviesCallback() {
-            @Override
-            public void onMoviesLoaded(@Nullable PaginatedMovieResponse response) {
-                callback.onMoviesLoaded(response);
-            }
-
-            @Override
-            public void onMoviesNotAvailable() {
-                callback.onMoviesNotAvailable();
-            }
-        });
+    private Single<PaginatedMovieResponse> getPopularMoviesFromRemote() {
+        return movieRemoteDataSource.getPopularMovies()
+                .doOnSuccess(response -> {
+                    Movie[] movies = response.movies.toArray(new Movie[response.movies.size()]);
+                    movieDao.insertAll(movies);
+                })
+                .observeOn(AndroidSchedulers.mainThread());
     }
 
-    public void getFavoriteMovies(@NonNull final MovieDataSource.LoadMoviesCallback callback) {
-        getFavoriteMoviesFromLocal(callback);
+    public Maybe<List<Movie>> getFavoriteMovies() {
+        return getFavoriteMoviesFromLocal();
     }
 
-    private void getFavoriteMoviesFromLocal(@NonNull final MovieDataSource.LoadMoviesCallback callback) {
-        favoriteLocalDataSource.getAll()
+    private Maybe<List<Movie>> getFavoriteMoviesFromLocal() {
+        return favoriteDao.getAll()
                 .flatMapSingle(favorites -> Observable.fromIterable(favorites)
                         .map(favorite -> favorite.movieId)
                         .toList())
-                .flatMapMaybe(movieLocalDataSource::findByIds)
+                .flatMapMaybe(movieDao::findByIds)
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(movies -> callback.onMoviesLoaded(new PaginatedMovieResponse(movies)));
+                .observeOn(AndroidSchedulers.mainThread());
     }
 
-    public void addFavoriteMovie(Movie movie) {
-        favoriteLocalDataSource.insert(new Favorite(movie.id));
+    public Completable addFavoriteMovie(Movie movie) {
+        return Completable.fromAction(() ->
+                favoriteDao.insert(new Favorite(movie.id)))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
     }
 
-    public void deleteFavoriteMovie(Movie movie) {
-        favoriteLocalDataSource.deleteById(movie.id);
+    public Completable deleteFavoriteMovie(Movie movie) {
+        return Completable.fromAction(() ->
+                favoriteDao.deleteById(movie.id))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
+    public Maybe<MovieDetail> getMovieDetailsById(int movieId) {
+        return Maybe.zip(
+                movieDao.findById(movieId),
+                favoriteDao.findById(movieId).map(favorite -> true).defaultIfEmpty(false),
+                getMovieReviewsFromRemote(movieId).toMaybe(),
+                MovieDetail::new)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
+    private Single<List<MovieReview>> getMovieReviewsFromRemote(int movieId) {
+        return movieRemoteDataSource.getMovieReviews(movieId)
+                .map(movieReviewDetails -> movieReviewDetails.movieReviews);
     }
 }

@@ -14,16 +14,16 @@ import com.esanz.nano.movies.repository.model.Movie;
 @Database(entities = {Movie.class, Favorite.class},
         version = 1,
         exportSchema = false)
-public abstract class MovieDatabase extends RoomDatabase {
+public abstract class MovieLocalDataSource extends RoomDatabase {
 
     private static final String DATABASE_NAME = "movies";
 
-    public static MovieDatabase sInstance;
+    public static MovieLocalDataSource sInstance;
 
-    public static MovieDatabase getInstance(Context context) {
+    public static MovieLocalDataSource getInstance(Context context) {
         if (sInstance == null) {
             sInstance = Room.databaseBuilder(context.getApplicationContext(),
-                    MovieDatabase.class, MovieDatabase.DATABASE_NAME)
+                    MovieLocalDataSource.class, MovieLocalDataSource.DATABASE_NAME)
                     .build();
         }
         return sInstance;
