@@ -2,75 +2,36 @@ package com.esanz.nano.movies.repository.api;
 
 import android.support.annotation.NonNull;
 
-import com.esanz.nano.movies.MovieApplication;
-import com.esanz.nano.movies.repository.MovieDataSource;
-import com.esanz.nano.movies.repository.model.Movie;
 import com.esanz.nano.movies.repository.model.PaginatedMovieResponse;
 
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.observers.DisposableSingleObserver;
+import io.reactivex.Single;
 import io.reactivex.schedulers.Schedulers;
 
-public class MovieRemoteDataSource implements MovieDataSource {
+public class MovieRemoteDataSource {
 
     private static MovieRemoteDataSource INSTANCE;
 
-    public static MovieRemoteDataSource getInstance() {
+    private final MovieApi movieApi;
+
+    public static MovieRemoteDataSource getInstance(@NonNull MovieApi movieApi) {
         if (INSTANCE == null) {
-            INSTANCE = new MovieRemoteDataSource();
+            INSTANCE = new MovieRemoteDataSource(movieApi);
         }
         return INSTANCE;
     }
 
-    // prevent direct instantiation
-    private MovieRemoteDataSource() {
+    private MovieRemoteDataSource(@NonNull MovieApi movieApi) {
+        this.movieApi = movieApi;
     }
 
-    @Override
-    public void getTopRatedMovies(@NonNull final LoadMoviesCallback callback) {
-        // TODO make Result Wrapper to handle errors
-        MovieApplication.movieApi.getTopRated()
-                .subscribeOn(Schedulers.io())
-                .doOnSuccess(response -> {
-                    Movie[] movies = response.movies.toArray(new Movie[response.movies.size()]);
-                    MovieApplication.movieDatabase.moviesDao().insertAll(movies);
-                })
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new DisposableSingleObserver<PaginatedMovieResponse>() {
-
-                    @Override
-                    public void onSuccess(PaginatedMovieResponse paginatedMovieResponse) {
-                        callback.onMoviesLoaded(paginatedMovieResponse);
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        callback.onMoviesNotAvailable();
-                    }
-
-                });
+    public Single<PaginatedMovieResponse> getTopRatedMovies() {
+        return movieApi.getTopRated()
+                .subscribeOn(Schedulers.io());
     }
 
-    @Override
-    public void getPopularMovies(@NonNull LoadMoviesCallback callback) {
-        MovieApplication.movieApi.getPopular()
-                .subscribeOn(Schedulers.io())
-                .doOnSuccess(response -> {
-                    Movie[] movies = response.movies.toArray(new Movie[response.movies.size()]);
-                    MovieApplication.movieDatabase.moviesDao().insertAll(movies);
-                })
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new DisposableSingleObserver<PaginatedMovieResponse>() {
-                    @Override
-                    public void onSuccess(PaginatedMovieResponse paginatedMovieResponse) {
-                        callback.onMoviesLoaded(paginatedMovieResponse);
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        callback.onMoviesNotAvailable();
-                    }
-                });
+    public Single<PaginatedMovieResponse> getPopularMovies() {
+        return movieApi.getPopular()
+                .subscribeOn(Schedulers.io());
     }
 
 }

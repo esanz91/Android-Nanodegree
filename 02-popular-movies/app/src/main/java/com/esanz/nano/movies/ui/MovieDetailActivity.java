@@ -1,5 +1,6 @@
 package com.esanz.nano.movies.ui;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -14,19 +15,14 @@ import android.widget.TextView;
 
 import com.esanz.nano.movies.MovieApplication;
 import com.esanz.nano.movies.R;
-import com.esanz.nano.movies.repository.dao.FavoriteDao;
-import com.esanz.nano.movies.repository.dao.MovieDao;
-import com.esanz.nano.movies.repository.model.Favorite;
 import com.esanz.nano.movies.repository.model.Movie;
+import com.esanz.nano.movies.ui.viewModel.MovieDetailsViewModel;
+import com.esanz.nano.movies.ui.viewModel.MovieDetailsViewModelFactory;
 import com.esanz.nano.movies.ui.widget.CheckableFloatingActionButton;
 import com.squareup.picasso.Picasso;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import io.reactivex.Completable;
-import io.reactivex.Maybe;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.schedulers.Schedulers;
 
 public class MovieDetailActivity extends AppCompatActivity {
 
@@ -35,8 +31,7 @@ public class MovieDetailActivity extends AppCompatActivity {
     private static final String EXTRA_MOVIE_ID = "movie_id";
 
     private boolean isUpdate = false;
-    private MovieDao mMovieDao;
-    private FavoriteDao mFavoriteDao;
+    private MovieDetailsViewModel movieViewModel;
 
     @BindView(R.id.collapsing_toolbar)
     CollapsingToolbarLayout collapsingToolbar;
@@ -80,18 +75,16 @@ public class MovieDetailActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        mMovieDao = MovieApplication.movieDatabase.moviesDao();
-        mFavoriteDao = MovieApplication.movieDatabase.favoritesDao();
+        MovieDetailsViewModelFactory movieFactory = new MovieDetailsViewModelFactory(
+                MovieApplication.movieRepository);
+        movieViewModel = ViewModelProviders.of(this, movieFactory)
+                .get(MovieDetailsViewModel.class);
+
+        movieViewModel.movieDetailsLiveData.observe(this, this::bindMovie);
 
         int movieId = getIntent().getIntExtra(EXTRA_MOVIE_ID, -1);
         if (movieId != -1) {
-            Maybe.zip(
-                    mMovieDao.findById(movieId),
-                    mFavoriteDao.findById(movieId).map(favorite -> true).defaultIfEmpty(false),
-                    Pair::new)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(this::bindMovie);
+            movieViewModel.loadMovieDetails(movieId);
         }
     }
 
@@ -99,7 +92,7 @@ public class MovieDetailActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                setResult(isUpdate? RESULT_RELOAD_FAVORITES : RESULT_OK);
+                setResult(isUpdate ? RESULT_RELOAD_FAVORITES : RESULT_OK);
                 finish();
                 return true;
         }
@@ -114,17 +107,9 @@ public class MovieDetailActivity extends AppCompatActivity {
         mAction.setOnClickListener(v -> {
             isUpdate = true;
             if (mAction.isChecked()) {
-                Completable.fromAction(() ->
-                        mFavoriteDao.insert(new Favorite(movie.id)))
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe();
+                movieViewModel.addFavoriteMovie(movie);
             } else {
-                Completable.fromAction(() ->
-                        mFavoriteDao.deleteById(movie.id))
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe();
+                movieViewModel.deleteFavoriteMovie(movie);
             }
         });
 

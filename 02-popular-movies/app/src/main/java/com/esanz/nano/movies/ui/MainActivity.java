@@ -10,10 +10,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.esanz.nano.movies.MovieApplication;
 import com.esanz.nano.movies.R;
-import com.esanz.nano.movies.repository.MovieRepository;
-import com.esanz.nano.movies.repository.api.MovieRemoteDataSource;
 import com.esanz.nano.movies.repository.model.Movie;
+import com.esanz.nano.movies.ui.adapter.MovieAdapter;
+import com.esanz.nano.movies.ui.viewModel.MovieListViewModel;
+import com.esanz.nano.movies.ui.viewModel.MovieListViewModelFactory;
 import com.esanz.nano.movies.utils.MovieConstant;
 
 public class MainActivity extends AppCompatActivity
@@ -23,7 +25,7 @@ public class MainActivity extends AppCompatActivity
 
     private final MovieAdapter movieAdapter = new MovieAdapter(this);
 
-    private MovieViewModel movieViewModel;
+    private MovieListViewModel movieViewModel;
 
     private PopupMenu popupMenu;
     private RecyclerView movieView;
@@ -39,13 +41,11 @@ public class MainActivity extends AppCompatActivity
         movieView = findViewById(R.id.movies);
         movieView.setAdapter(movieAdapter);
 
-        // TODO use dagger injection
-        MovieRepository movieRepository = MovieRepository.getInstance(
-                MovieRemoteDataSource.getInstance()
-        );
-        ViewModelFactory movieFactory = new ViewModelFactory(movieRepository);
+        MovieListViewModelFactory movieFactory = new MovieListViewModelFactory(
+                MovieApplication.movieRepository);
 
-        movieViewModel = ViewModelProviders.of(this, movieFactory).get(MovieViewModel.class);
+        movieViewModel = ViewModelProviders.of(this, movieFactory)
+                .get(MovieListViewModel.class);
 
         @MovieConstant.SortTypeDef int sortType = movieViewModel.getSortType();
         switch (sortType) {
