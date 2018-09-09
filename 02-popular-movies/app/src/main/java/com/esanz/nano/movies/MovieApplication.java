@@ -11,14 +11,12 @@ import com.esanz.nano.movies.repository.api.RetrofitClient;
 public class MovieApplication extends Application {
 
     public static MovieRepository movieRepository;
-    // TODO local should not be global
-    public static MovieLocalDataSource movieLocalDatabase;
 
     @Override
     public void onCreate() {
         super.onCreate();
         MovieApi movieApi = RetrofitClient.getMovieApi(getApplicationContext());
-        movieLocalDatabase = MovieLocalDataSource.getInstance(getApplicationContext());
+        MovieLocalDataSource movieLocalDatabase = MovieLocalDataSource.getInstance(getApplicationContext());
         MovieRemoteDataSource movieRemoteDatabase = MovieRemoteDataSource.getInstance(movieApi);
         movieRepository = MovieRepository.getInstance(movieRemoteDatabase, movieLocalDatabase);
     }

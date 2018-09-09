@@ -26,7 +26,7 @@
             android:layout_weight="1"
             android:ellipsize="end"
             android:maxLines="3"
-            tools:text="Summertime 2016 has not been very kind to DC Comics-based personalities looking to shine consistently like their big screen Marvel Comics counterparts. Following the super-sized dud that was _Batman v. Superman: Dawn of Justice_ released a few months ago must really put some major" />
+            tools:text="@tools:sample/lorem/random" />
 
         <TextView
             android:id="@+id/read_more"
