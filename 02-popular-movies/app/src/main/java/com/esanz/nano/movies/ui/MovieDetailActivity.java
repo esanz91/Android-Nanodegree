@@ -6,20 +6,30 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.CollapsingToolbarLayout;
-import android.support.v4.util.Pair;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearSnapHelper;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SnapHelper;
 import android.support.v7.widget.Toolbar;
+import android.view.Gravity;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.esanz.nano.movies.MovieApplication;
 import com.esanz.nano.movies.R;
 import com.esanz.nano.movies.repository.model.Movie;
+import com.esanz.nano.movies.repository.model.MovieDetail;
+import com.esanz.nano.movies.repository.model.MovieReview;
+import com.esanz.nano.movies.ui.adapter.MovieReviewAdapter;
 import com.esanz.nano.movies.ui.viewModel.MovieDetailsViewModel;
 import com.esanz.nano.movies.ui.viewModel.MovieDetailsViewModelFactory;
 import com.esanz.nano.movies.ui.widget.CheckableFloatingActionButton;
 import com.squareup.picasso.Picasso;
+
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -31,6 +41,8 @@ public class MovieDetailActivity extends AppCompatActivity {
     private static final String EXTRA_MOVIE_ID = "movie_id";
 
     private boolean isUpdate = false;
+    private MovieReviewAdapter movieReviewAdapter = new MovieReviewAdapter();
+    private SnapHelper snapHelper = new LinearSnapHelper();
     private MovieDetailsViewModel movieViewModel;
 
     @BindView(R.id.collapsing_toolbar)
@@ -60,6 +72,12 @@ public class MovieDetailActivity extends AppCompatActivity {
     @BindView(R.id.overview)
     TextView overviewView;
 
+    @BindView(R.id.reviews_container)
+    LinearLayout reviewsContainer;
+
+    @BindView(R.id.reviews)
+    RecyclerView reviewList;
+
     public static Intent createIntent(@NonNull final Context context, @NonNull final Movie movie) {
         Intent intent = new Intent(context, MovieDetailActivity.class);
         intent.putExtra(EXTRA_MOVIE_ID, movie.id);
@@ -74,6 +92,9 @@ public class MovieDetailActivity extends AppCompatActivity {
 
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        reviewList.setAdapter(movieReviewAdapter);
+        snapHelper.attachToRecyclerView(reviewList);
 
         MovieDetailsViewModelFactory movieFactory = new MovieDetailsViewModelFactory(
                 MovieApplication.movieRepository);
@@ -99,9 +120,10 @@ public class MovieDetailActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void bindMovie(@NonNull final Pair<Movie, Boolean> pair) {
-        Movie movie = pair.first;
-        Boolean isFavorite = pair.second;
+    private void bindMovie(@NonNull final MovieDetail movieDetail) {
+        Movie movie = movieDetail.movie;
+        boolean isFavorite = movieDetail.isFavorite;
+        List<MovieReview> reviews = movieDetail.reviews;
 
         mAction.setChecked(isFavorite);
         mAction.setOnClickListener(v -> {
@@ -125,6 +147,11 @@ public class MovieDetailActivity extends AppCompatActivity {
         releaseDateView.setText(movie.getReleaseDate());
         ratingView.setText(getString(R.string.rating, movie.voteAverage, Movie.MAX_RATING));
         overviewView.setText(movie.overview);
+
+        if (!reviews.isEmpty()) {
+            reviewsContainer.setVisibility(View.VISIBLE);
+            movieReviewAdapter.setReviews(reviews);
+        }
     }
 
 }

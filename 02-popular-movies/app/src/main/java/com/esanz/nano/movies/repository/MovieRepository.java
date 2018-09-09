@@ -8,8 +8,12 @@ import com.esanz.nano.movies.repository.dao.FavoriteDao;
 import com.esanz.nano.movies.repository.dao.MovieDao;
 import com.esanz.nano.movies.repository.model.Favorite;
 import com.esanz.nano.movies.repository.model.Movie;
+import com.esanz.nano.movies.repository.model.MovieDetail;
+import com.esanz.nano.movies.repository.model.MovieReview;
 import com.esanz.nano.movies.repository.model.PaginatedMovieResponse;
+import com.esanz.nano.movies.repository.model.PaginatedMovieReviewResponse;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -101,12 +105,18 @@ public class MovieRepository {
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    public Maybe<Pair<Movie, Boolean>> getMovieDetailsById(int movieId) {
+    public Maybe<MovieDetail> getMovieDetailsById(int movieId) {
         return Maybe.zip(
                 movieDao.findById(movieId),
                 favoriteDao.findById(movieId).map(favorite -> true).defaultIfEmpty(false),
-                Pair::new)
+                getMovieReviewsFromRemote(movieId).toMaybe(),
+                MovieDetail::new)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
+    }
+
+    private Single<List<MovieReview>> getMovieReviewsFromRemote(int movieId) {
+        return movieRemoteDataSource.getMovieReviews(movieId)
+                .map(movieReviewDetails -> movieReviewDetails.movieReviews);
     }
 }

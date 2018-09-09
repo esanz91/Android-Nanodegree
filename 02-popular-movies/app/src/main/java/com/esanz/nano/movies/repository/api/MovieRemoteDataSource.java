@@ -3,6 +3,7 @@ package com.esanz.nano.movies.repository.api;
 import android.support.annotation.NonNull;
 
 import com.esanz.nano.movies.repository.model.PaginatedMovieResponse;
+import com.esanz.nano.movies.repository.model.PaginatedMovieReviewResponse;
 
 import io.reactivex.Single;
 import io.reactivex.schedulers.Schedulers;
@@ -34,4 +35,8 @@ public class MovieRemoteDataSource {
                 .subscribeOn(Schedulers.io());
     }
 
+    public Single<PaginatedMovieReviewResponse> getMovieReviews(int movieId) {
+        return movieApi.getReviews(movieId)
+                .subscribeOn(Schedulers.io());
+    }
 }

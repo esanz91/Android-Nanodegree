@@ -23,9 +23,6 @@ public class MovieAdapter extends RecyclerView.Adapter<SimpleViewHolder> {
         void onFavoriteClick(Movie movie, boolean isFavorite);
     }
 
-    @LayoutRes
-    private final int layout = R.layout.list_item_poster;
-
     private List<Movie> movies;
     private OnMovieClickListener listener;
 
@@ -37,7 +34,7 @@ public class MovieAdapter extends RecyclerView.Adapter<SimpleViewHolder> {
     @Override
     public SimpleViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
-                .inflate(layout, parent, false);
+                .inflate(R.layout.list_item_poster, parent, false);
         SimpleViewHolder view = new SimpleViewHolder(itemView);
 
         view.onItemClick((v, position) -> listener.onMoviePosterClick(movies.get(position)));

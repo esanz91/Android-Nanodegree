@@ -3,16 +3,16 @@ package com.esanz.nano.movies.ui.viewModel;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 import android.support.annotation.NonNull;
-import android.support.v4.util.Pair;
 
 import com.esanz.nano.movies.repository.MovieRepository;
 import com.esanz.nano.movies.repository.model.Movie;
+import com.esanz.nano.movies.repository.model.MovieDetail;
 
 import java.util.Objects;
 
 public class MovieDetailsViewModel extends ViewModel {
 
-    public final MutableLiveData<Pair<Movie, Boolean>> movieDetailsLiveData = new MutableLiveData<>();
+    public final MutableLiveData<MovieDetail> movieDetailsLiveData = new MutableLiveData<>();
 
     private final MovieRepository movieRepository;
 
