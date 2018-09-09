@@ -1,4 +1,4 @@
-package com.esanz.nano.movies.ui;
+package com.esanz.nano.movies.ui.adapter;
 
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
@@ -11,7 +11,6 @@ import android.widget.ImageView;
 import com.esanz.nano.movies.R;
 import com.esanz.nano.movies.repository.model.Movie;
 import com.esanz.nano.movies.ui.widget.CheckableFloatingActionButton;
-import com.esanz.nano.movies.ui.widget.SimpleViewHolder;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;

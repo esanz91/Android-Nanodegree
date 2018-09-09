@@ -1,4 +1,4 @@
-package com.esanz.nano.movies.ui;
+package com.esanz.nano.movies.ui.viewModel;
 
 import android.arch.lifecycle.ViewModel;
 import android.arch.lifecycle.ViewModelProvider;
@@ -17,8 +17,8 @@ public class ViewModelFactory implements ViewModelProvider.Factory {
     @NonNull
     @Override
     public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
-        if (modelClass.isAssignableFrom(MovieViewModel.class)) {
-            return (T) new MovieViewModel(movieRepository);
+        if (modelClass.isAssignableFrom(MovieListViewModel.class)) {
+            return (T) new MovieListViewModel(movieRepository);
         }
 
         throw new IllegalArgumentException("Unknown ViewModel class");
