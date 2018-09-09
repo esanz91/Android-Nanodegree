@@ -92,7 +92,9 @@ public class MainActivity extends AppCompatActivity
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == REQUEST_DETAILS && resultCode == MovieDetailActivity.RESULT_RELOAD_FAVORITES) {
+        if (requestCode == REQUEST_DETAILS &&
+                resultCode == MovieDetailActivity.RESULT_RELOAD_FAVORITES &&
+                movieViewModel.getSortType() == MovieConstant.SortType.FAVORITES) {
             movieViewModel.loadFavoriteMovies();
         }
     }
