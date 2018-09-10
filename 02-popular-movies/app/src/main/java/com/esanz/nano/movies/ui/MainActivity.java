@@ -3,12 +3,15 @@ package com.esanz.nano.movies.ui;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.StringRes;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 
 import com.esanz.nano.movies.MovieApplication;
 import com.esanz.nano.movies.R;
@@ -29,7 +32,7 @@ public class MainActivity extends AppCompatActivity
 
     private PopupMenu popupMenu;
     private RecyclerView movieView;
-    private View emptyStateView;
+    private TextView emptyStateView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,12 +53,15 @@ public class MainActivity extends AppCompatActivity
         @MovieConstant.SortTypeDef int sortType = movieViewModel.getSortType();
         switch (sortType) {
             case MovieConstant.SortType.RATING:
+                getSupportActionBar().setTitle(R.string.nav_rating);
                 movieViewModel.loadTopRatedMovies();
                 break;
             case MovieConstant.SortType.POPULARITY:
+                getSupportActionBar().setTitle(R.string.nav_popularity);
                 movieViewModel.loadPopularMovies();
                 break;
             case MovieConstant.SortType.FAVORITES:
+                getSupportActionBar().setTitle(R.string.nav_favorites);
                 movieViewModel.loadFavoriteMovies();
         }
 
@@ -66,7 +72,12 @@ public class MainActivity extends AppCompatActivity
                         emptyStateView.setVisibility(View.GONE);
                         movieView.setVisibility(View.VISIBLE);
                     } else {
-                        emptyStateView.setVisibility(View.VISIBLE);
+                        int msgRes = getEmptyMessage();
+                        if (msgRes != -1) {
+                            emptyStateView.setVisibility(View.VISIBLE);
+                            emptyStateView.setText(msgRes);
+                        }
+
                         movieView.setVisibility(View.GONE);
                     }
                 });
@@ -131,12 +142,15 @@ public class MainActivity extends AppCompatActivity
             item.setChecked(true);
             switch (item.getItemId()) {
                 case R.id.sort_by_rating:
+                    getSupportActionBar().setTitle(R.string.nav_rating);
                     movieViewModel.loadTopRatedMovies();
                     return true;
                 case R.id.sort_by_popularity:
+                    getSupportActionBar().setTitle(R.string.nav_popularity);
                     movieViewModel.loadPopularMovies();
                     return true;
                 case R.id.sort_by_favorite:
+                    getSupportActionBar().setTitle(R.string.nav_favorites);
                     movieViewModel.loadFavoriteMovies();
                     return true;
             }
@@ -157,5 +171,18 @@ public class MainActivity extends AppCompatActivity
         }
 
         popupMenu.show();
+    }
+
+    @StringRes
+    private int getEmptyMessage(){
+        switch(movieViewModel.getSortType()) {
+            case MovieConstant.SortType.RATING:
+                return R.string.no_top_rated_msg;
+            case MovieConstant.SortType.POPULARITY:
+                return R.string.no_most_popular_msg;
+            case MovieConstant.SortType.FAVORITES:
+                return R.string.no_favorites_msg;
+        }
+        return -1;
     }
 }

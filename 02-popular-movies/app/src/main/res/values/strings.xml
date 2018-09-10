@@ -18,7 +18,9 @@
 
     <string name="rating">%1$.1f / %2$d</string>
 
-    <string name="no_movies_msg">Oops, we\'re unable to load movies at this time. Please try again later!</string>
+    <string name="no_top_rated_msg">Oops, we\'re unable to load top rated movies at this time. Please try again later!</string>
+    <string name="no_most_popular_msg">Oops, we\'re unable to most popular movies at this time. Please try again later!</string>
+    <string name="no_favorites_msg">Hmmm, looks like you don\'t have any movies on your favorite list yet.</string>
     <string name="no_reviews_msg">Oops, looks like there are no reviews.</string>
     <string name="no_videos_msg">Oops, looks like there are no videos.</string>
 

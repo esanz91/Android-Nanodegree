@@ -40,7 +40,7 @@
             android:background="@android:color/white"
             android:gravity="center"
             android:padding="64dp"
-            android:text="@string/no_movies_msg"
+            android:text="@string/no_top_rated_msg"
             android:visibility="gone" />
 
     </FrameLayout>
