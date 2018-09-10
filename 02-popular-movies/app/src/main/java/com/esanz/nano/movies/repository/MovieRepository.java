@@ -1,7 +1,6 @@
 package com.esanz.nano.movies.repository;
 
 import android.support.annotation.NonNull;
-import android.support.v4.util.Pair;
 
 import com.esanz.nano.movies.repository.api.MovieRemoteDataSource;
 import com.esanz.nano.movies.repository.dao.FavoriteDao;
@@ -12,7 +11,6 @@ import com.esanz.nano.movies.repository.model.MovieDetail;
 import com.esanz.nano.movies.repository.model.MovieReview;
 import com.esanz.nano.movies.repository.model.MovieVideo;
 import com.esanz.nano.movies.repository.model.PaginatedMovieResponse;
-import com.esanz.nano.movies.repository.model.PaginatedMovieReviewResponse;
 
 import java.util.Collections;
 import java.util.List;
@@ -110,8 +108,10 @@ public class MovieRepository {
         return Maybe.zip(
                 movieDao.findById(movieId),
                 favoriteDao.findById(movieId).map(favorite -> true).defaultIfEmpty(false),
-                getMovieVideosFromRemote(movieId).toMaybe(),
-                getMovieReviewsFromRemote(movieId).toMaybe(),
+                getMovieVideosFromRemote(movieId).toMaybe()
+                        .onErrorReturnItem(Collections.emptyList()),
+                getMovieReviewsFromRemote(movieId).toMaybe()
+                        .onErrorReturnItem(Collections.emptyList()),
                 MovieDetail::new)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
