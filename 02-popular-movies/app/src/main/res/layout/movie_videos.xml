@@ -2,34 +2,33 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/reviews_container"
+    android:id="@+id/videos_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginBottom="24dp"
-    android:layout_marginTop="24dp"
     android:background="@color/background"
     android:orientation="vertical">
 
     <TextView
-        android:id="@+id/reviews_label"
+        android:id="@+id/videos_label"
         style="@style/MovieCaption"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="24dp"
         android:layout_marginRight="24dp"
-        android:text="@string/label_reviews" />
+        android:layout_marginTop="24dp"
+        android:text="@string/label_videos" />
 
     <TextView
-        android:id="@+id/reviews_empty"
+        android:id="@+id/videos_empty"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
         android:padding="24dp"
-        android:text="@string/no_reviews_msg"
+        android:text="@string/no_videos_msg"
         android:visibility="gone" />
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/reviews"
+        android:id="@+id/videos"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
@@ -39,7 +38,7 @@
         android:paddingRight="24dp"
         android:visibility="gone"
         app:layoutManager="android.support.v7.widget.LinearLayoutManager"
-        tools:listitem="@layout/list_item_review"
+        tools:listitem="@layout/list_item_video"
         tools:visibility="visible" />
 
 </LinearLayout>

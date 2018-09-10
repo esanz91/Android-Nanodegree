@@ -67,6 +67,8 @@
 
             <include layout="@layout/movie_summary" />
 
+            <include layout="@layout/movie_videos" />
+
             <include layout="@layout/movie_reviews" />
 
         </LinearLayout>

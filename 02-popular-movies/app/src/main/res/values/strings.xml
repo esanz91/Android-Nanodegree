@@ -12,10 +12,14 @@
     <string name="label_rating">Rating</string>
     <string name="label_overview">Overview</string>
     <string name="label_reviews">Reviews</string>
+    <string name="label_videos">Videos</string>
 
     <string name="action_read_more">&lt;a href="%s">Read more&lt;/a></string>
 
     <string name="rating">%1$.1f / %2$d</string>
 
     <string name="no_movies_msg">Oops, we\'re unable to load movies at this time. Please try again later!</string>
+    <string name="no_reviews_msg">Oops, looks like there are no reviews.</string>
+    <string name="no_videos_msg">Oops, looks like there are no videos.</string>
+
 </resources>

@@ -4,7 +4,6 @@ import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.text.Spannable;
-import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,14 +31,14 @@ public class MovieReviewAdapter extends RecyclerView.Adapter<SimpleViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull SimpleViewHolder holder, int position) {
         MovieReview review = reviews.get(position);
-        if (null != review) {
-            holder.<TextView>get(R.id.author).setText(review.author + ":");
-            holder.<TextView>get(R.id.content).setText(review.content);
-            String link = holder.itemView.getContext().getString(R.string.action_read_more, review.url);
-            Spannable spannable = MovieStringUtils.removeUrlUnderline((Spannable) Html.fromHtml(link));
-            holder.<TextView>get(R.id.read_more).setText(spannable);
-            holder.<TextView>get(R.id.read_more).setMovementMethod(LinkMovementMethod.getInstance());
-        }
+
+        holder.<TextView>get(R.id.author).setText(review.author + ":");
+        holder.<TextView>get(R.id.content).setText(review.content);
+
+        String link = holder.itemView.getContext().getString(R.string.action_read_more, review.url);
+        Spannable spannable = MovieStringUtils.removeUrlUnderline((Spannable) Html.fromHtml(link));
+        holder.<TextView>get(R.id.read_more).setText(spannable);
+        holder.<TextView>get(R.id.read_more).setMovementMethod(LinkMovementMethod.getInstance());
     }
 
     @Override
