@@ -131,6 +131,12 @@ public class MovieDetailActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onBackPressed() {
+        setResult(isUpdate ? RESULT_RELOAD_FAVORITES : RESULT_OK);
+        super.onBackPressed();
+    }
+
     private void bindMovie(@NonNull final MovieDetail movieDetail) {
         Movie movie = movieDetail.movie;
         boolean isFavorite = movieDetail.isFavorite;
