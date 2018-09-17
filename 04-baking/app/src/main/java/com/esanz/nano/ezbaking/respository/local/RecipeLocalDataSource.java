@@ -14,6 +14,7 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Type;
 import java.util.List;
 
+@Deprecated
 public class RecipeLocalDataSource {
 
     @RawRes
