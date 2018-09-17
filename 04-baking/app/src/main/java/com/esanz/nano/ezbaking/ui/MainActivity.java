@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 
+import com.esanz.nano.ezbaking.EzBakingApplication;
 import com.esanz.nano.ezbaking.R;
 import com.esanz.nano.ezbaking.respository.RecipeRepository;
 import com.esanz.nano.ezbaking.ui.adapter.RecipesAdapter;
@@ -38,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
         mRecipesView.setAdapter(mRecipesAdapter);
 
         RecipesViewModelFactory recipesViewModelFactory =
-                new RecipesViewModelFactory(RecipeRepository.getInstance());
+                new RecipesViewModelFactory(EzBakingApplication.RECIPE_REPOSITORY);
         mRecipesViewModel = ViewModelProviders.of(this, recipesViewModelFactory)
                 .get(RecipesViewModel.class);
         mRecipesViewModel.getRecipes()

@@ -3,33 +3,44 @@ package com.esanz.nano.ezbaking.respository;
 import android.support.annotation.NonNull;
 
 import com.esanz.nano.ezbaking.respository.api.RecipeApi;
-import com.esanz.nano.ezbaking.respository.api.RetrofitClient;
+import com.esanz.nano.ezbaking.respository.db.RecipeDao;
+import com.esanz.nano.ezbaking.respository.db.RecipeDb;
 import com.esanz.nano.ezbaking.respository.model.Recipe;
 
 import java.util.List;
 
 import io.reactivex.Single;
+import timber.log.Timber;
 
 public class RecipeRepository {
 
     private static RecipeRepository INSTANCE;
 
     private final RecipeApi mRecipeApi;
+    private final RecipeDao mRecipeDao;
 
-    private RecipeRepository(@NonNull final RecipeApi recipeApi) {
+    private RecipeRepository(@NonNull final RecipeApi recipeApi, @NonNull final RecipeDb recipeDb) {
         mRecipeApi = recipeApi;
+        mRecipeDao = recipeDb.recipeDao();
     }
 
-    // TODO should pass in RetrofitClient in constructor
-    public static RecipeRepository getInstance() {
+    public static RecipeRepository getInstance(@NonNull final RecipeApi recipeApi,
+                                               @NonNull final RecipeDb recipeDb) {
         if (null == INSTANCE) {
-            INSTANCE = new RecipeRepository(RetrofitClient.getInstance().create(RecipeApi.class));
+            INSTANCE = new RecipeRepository(recipeApi, recipeDb);
         }
 
         return INSTANCE;
     }
 
     public Single<List<Recipe>> getRecipes() {
-        return mRecipeApi.getRecipes();
+        return mRecipeApi.getRecipes()
+                .doOnSuccess(mRecipeDao::insertRecipes)
+                .onErrorResumeNext(e -> {
+                    Timber.e(e);
+                    Single<List<Recipe>> r = Single.just(mRecipeDao.getRecipes());
+                    return r;
+                });
     }
+
 }
