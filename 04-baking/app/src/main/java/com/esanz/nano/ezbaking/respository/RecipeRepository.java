@@ -38,8 +38,7 @@ public class RecipeRepository {
                 .doOnSuccess(mRecipeDao::insertRecipes)
                 .onErrorResumeNext(e -> {
                     Timber.e(e);
-                    Single<List<Recipe>> r = Single.just(mRecipeDao.getRecipes());
-                    return r;
+                    return Single.just(mRecipeDao.getRecipes());
                 });
     }
 

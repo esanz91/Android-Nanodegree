@@ -16,9 +16,6 @@ import java.util.List;
 @Dao
 public abstract class RecipeDao {
 
-    @Query("SELECT * FROM  " + Recipe.TABLE_NAME)
-    public abstract List<Recipe> getAll();
-
     @Query("SELECT * FROM " + Recipe.TABLE_NAME)
     abstract List<RecipeDetail> getRecipesWithDetails();
 
