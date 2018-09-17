@@ -17,11 +17,7 @@ import java.util.List;
 
 public class RecipesAdapter extends RecyclerView.Adapter<SimpleViewHolder> {
 
-    private final List<Recipe> recipes;
-
-    public RecipesAdapter(List<Recipe> recipes) {
-        this.recipes = recipes;
-    }
+    private List<Recipe> recipes;
 
     @NonNull
     @Override
@@ -53,6 +49,11 @@ public class RecipesAdapter extends RecyclerView.Adapter<SimpleViewHolder> {
 
     public List<Recipe> getRecipes() {
         return recipes;
+    }
+
+    public void setRecipes(List<Recipe> recipes) {
+        this.recipes = recipes;
+        notifyDataSetChanged();
     }
 
 }

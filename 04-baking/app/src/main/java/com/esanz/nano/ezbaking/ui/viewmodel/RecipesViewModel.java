@@ -1,24 +1,34 @@
 package com.esanz.nano.ezbaking.ui.viewmodel;
 
-import android.app.Application;
-import android.arch.lifecycle.AndroidViewModel;
+import android.arch.lifecycle.MutableLiveData;
+import android.arch.lifecycle.ViewModel;
 import android.support.annotation.NonNull;
 
-import com.esanz.nano.ezbaking.respository.RecipeDataSource;
+import com.esanz.nano.ezbaking.respository.RecipeRepository;
 import com.esanz.nano.ezbaking.respository.model.Recipe;
 
 import java.util.List;
 
-public class RecipesViewModel extends AndroidViewModel {
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import timber.log.Timber;
 
-    private final List<Recipe> recipes;
+public class RecipesViewModel extends ViewModel {
 
-    public RecipesViewModel(@NonNull Application application) {
-        super(application);
-        recipes = RecipeDataSource.getRecipes(getApplication());
+    private final RecipeRepository recipeRepository;
+    private final MutableLiveData<List<Recipe>> recipes = new MutableLiveData<>();
+
+    public RecipesViewModel(@NonNull final RecipeRepository recipeRepository) {
+        this.recipeRepository = recipeRepository;
+        loadRecipes();
     }
 
-    public List<Recipe> getRecipes() {
+    public void loadRecipes() {
+        recipeRepository.getRecipes()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(recipes::postValue, Timber::e);
+    }
+
+    public MutableLiveData<List<Recipe>> getRecipes() {
         return recipes;
     }
 

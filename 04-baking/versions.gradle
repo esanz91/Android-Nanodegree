@@ -17,6 +17,7 @@ ext {
             rxJava2             : '2.2.2',
             rxAndroid2          : '2.1.0',
 
+            timber              : '4.7.1',
             butterknife         : '8.8.1',
             picasso             : '2.5.2',
 

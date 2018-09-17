@@ -7,8 +7,10 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 
 import com.esanz.nano.ezbaking.R;
+import com.esanz.nano.ezbaking.respository.RecipeRepository;
 import com.esanz.nano.ezbaking.ui.adapter.RecipesAdapter;
 import com.esanz.nano.ezbaking.ui.viewmodel.RecipesViewModel;
+import com.esanz.nano.ezbaking.ui.viewmodel.RecipesViewModelFactory;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -32,9 +34,15 @@ public class MainActivity extends AppCompatActivity {
 
         setSupportActionBar(toolbar);
 
-        mRecipesViewModel = ViewModelProviders.of(this).get(RecipesViewModel.class);
-        mRecipesAdapter = new RecipesAdapter(mRecipesViewModel.getRecipes());
+        mRecipesAdapter = new RecipesAdapter();
         mRecipesView.setAdapter(mRecipesAdapter);
+
+        RecipesViewModelFactory recipesViewModelFactory =
+                new RecipesViewModelFactory(RecipeRepository.getInstance());
+        mRecipesViewModel = ViewModelProviders.of(this, recipesViewModelFactory)
+                .get(RecipesViewModel.class);
+        mRecipesViewModel.getRecipes()
+                .observe(this, recipes -> mRecipesAdapter.setRecipes(recipes));
     }
 
 }
