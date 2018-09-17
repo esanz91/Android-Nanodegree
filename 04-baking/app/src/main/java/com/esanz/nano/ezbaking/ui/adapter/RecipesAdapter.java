@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.esanz.nano.ezbaking.R;
 import com.esanz.nano.ezbaking.respository.model.Recipe;
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -35,11 +36,11 @@ public class RecipesAdapter extends RecyclerView.Adapter<SimpleViewHolder> {
 
         holder.<TextView>get(R.id.name).setText(recipe.name);
 
-        if (!TextUtils.isEmpty(recipe.image)) {
-            Picasso.with(holder.itemView.getContext())
-                    .load(recipe.image)
-                    .into(holder.<ImageView>get(R.id.image));
-        }
+        ImageView imageView = holder.get(R.id.image);
+        Picasso.with(imageView.getContext())
+                .load(!TextUtils.isEmpty(recipe.image) ? recipe.image : null)
+                .placeholder(R.drawable.recipe_placeholder)
+                .into(imageView);
     }
 
     @Override
