@@ -1,5 +1,6 @@
 package com.esanz.nano.ezbaking.ui.adapter;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -11,7 +12,7 @@ import android.widget.TextView;
 
 import com.esanz.nano.ezbaking.R;
 import com.esanz.nano.ezbaking.respository.model.Recipe;
-import com.squareup.picasso.Callback;
+import com.esanz.nano.ezbaking.ui.RecipeDetailActivity;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -25,9 +26,11 @@ public class RecipesAdapter extends RecyclerView.Adapter<SimpleViewHolder> {
     public SimpleViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.list_item_recipe, parent, false);
-        SimpleViewHolder view = new SimpleViewHolder(itemView);
-        // TODO set click listener on itemView
-        return view;
+        SimpleViewHolder holder = new SimpleViewHolder(itemView);
+        Context context = parent.getContext();
+        holder.onItemClick((v, position) ->
+                context.startActivity(RecipeDetailActivity.createIntent(context, recipes.get(position))));
+        return holder;
     }
 
     @Override

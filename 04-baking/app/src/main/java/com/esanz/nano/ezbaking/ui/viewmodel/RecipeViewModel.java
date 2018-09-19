@@ -7,31 +7,31 @@ import android.support.annotation.NonNull;
 import com.esanz.nano.ezbaking.respository.RecipeRepository;
 import com.esanz.nano.ezbaking.respository.model.Recipe;
 
-import java.util.List;
-
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import timber.log.Timber;
 
-public class RecipesViewModel extends ViewModel {
+public class RecipeViewModel extends ViewModel {
 
+    private final int recipeId;
     private final RecipeRepository recipeRepository;
-    private final MutableLiveData<List<Recipe>> recipes = new MutableLiveData<>();
+    private final MutableLiveData<Recipe> recipeLiveData = new MutableLiveData<>();
     private final CompositeDisposable disposables = new CompositeDisposable();
 
-    public RecipesViewModel(@NonNull final RecipeRepository recipeRepository) {
+    public RecipeViewModel(@NonNull final RecipeRepository recipeRepository, final int id) {
+        this.recipeId = id;
         this.recipeRepository = recipeRepository;
-        loadRecipes();
+        loadRecipe(id);
     }
 
-    public void loadRecipes() {
-        disposables.add(recipeRepository.getRecipes()
+    public void loadRecipe(final int id) {
+        disposables.add(recipeRepository.getRecipe(id)
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(recipes::postValue, Timber::e));
+                .subscribe(recipeLiveData::postValue, Timber::e));
     }
 
-    public MutableLiveData<List<Recipe>> getRecipes() {
-        return recipes;
+    public MutableLiveData<Recipe> getRecipe() {
+        return recipeLiveData;
     }
 
     @Override
