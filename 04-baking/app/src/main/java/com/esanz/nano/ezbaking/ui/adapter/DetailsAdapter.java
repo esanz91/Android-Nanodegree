@@ -60,7 +60,7 @@ public class DetailsAdapter extends RecyclerView.Adapter<SimpleViewHolder> {
                 break;
             case RecipeDetail.TYPE_STEP:
                 Step step = (Step) detail;
-                holder.<TextView>get(R.id.step).setText(step.description);
+                holder.<TextView>get(R.id.step).setText(step.shortDescription);
                 break;
         }
     }
