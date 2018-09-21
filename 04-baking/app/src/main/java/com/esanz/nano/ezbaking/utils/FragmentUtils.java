@@ -5,7 +5,7 @@ import android.os.Bundle;
 
 public class FragmentUtils {
 
-    public static Bundle intentToFragmentArguments(Intent intent) {
+    public static Bundle intentToArguments(Intent intent) {
         Bundle arguments = new Bundle();
         if (null == intent) {
             return arguments;

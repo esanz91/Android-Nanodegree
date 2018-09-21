@@ -3,13 +3,11 @@ package com.esanz.nano.ezbaking.ui;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
 import com.esanz.nano.ezbaking.R;
 import com.esanz.nano.ezbaking.RecipeDetailFragment;
-import com.esanz.nano.ezbaking.respository.RecipeDetail;
 import com.esanz.nano.ezbaking.respository.model.Recipe;
 import com.esanz.nano.ezbaking.utils.FragmentUtils;
 
@@ -41,7 +39,7 @@ public class RecipeDetailActivity extends AppCompatActivity
 
         if (savedInstanceState == null) {
             RecipeDetailFragment fragment = new RecipeDetailFragment();
-            fragment.setArguments(FragmentUtils.intentToFragmentArguments(getIntent()));
+            fragment.setArguments(FragmentUtils.intentToArguments(getIntent()));
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.container, fragment, "recipe_detail")
                     .commit();
