@@ -1,4 +1,4 @@
-package com.esanz.nano.ezbaking;
+package com.esanz.nano.ezbaking.ui;
 
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
@@ -13,6 +13,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.esanz.nano.ezbaking.EzBakingApplication;
+import com.esanz.nano.ezbaking.R;
 import com.esanz.nano.ezbaking.respository.RecipeDetail;
 import com.esanz.nano.ezbaking.respository.model.Ingredient;
 import com.esanz.nano.ezbaking.respository.model.Recipe;

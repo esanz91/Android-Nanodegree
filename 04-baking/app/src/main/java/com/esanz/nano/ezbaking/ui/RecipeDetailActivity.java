@@ -7,7 +7,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
 import com.esanz.nano.ezbaking.R;
-import com.esanz.nano.ezbaking.RecipeDetailFragment;
 import com.esanz.nano.ezbaking.respository.model.Recipe;
 import com.esanz.nano.ezbaking.utils.FragmentUtils;
 
