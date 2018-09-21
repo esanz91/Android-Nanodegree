@@ -18,14 +18,14 @@ import butterknife.ButterKnife;
 
 public class MainActivity extends AppCompatActivity {
 
+    private RecipesViewModel mRecipesViewModel;
+    private RecipesAdapter mRecipesAdapter;
+
     @BindView(R.id.toolbar)
     Toolbar toolbar;
 
     @BindView(R.id.recipes)
     RecyclerView mRecipesView;
-
-    private RecipesViewModel mRecipesViewModel;
-    private RecipesAdapter mRecipesAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

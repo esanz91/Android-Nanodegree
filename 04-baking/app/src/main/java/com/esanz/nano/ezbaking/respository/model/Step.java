@@ -6,6 +6,7 @@ import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
 
+import com.esanz.nano.ezbaking.respository.RecipeDetail;
 import com.google.gson.annotations.SerializedName;
 
 
@@ -15,7 +16,9 @@ import com.google.gson.annotations.SerializedName;
                 parentColumns = Recipe.COLUMN_PRIMARY_KEY,
                 childColumns = Step.COLUMN_FOREIGN_KEY,
                 onDelete = ForeignKey.CASCADE))
-public class Step {
+public class Step implements RecipeDetail {
+
+    public static final String TITLE = "Instructions";
 
     public static final String TABLE_NAME = "steps";
     public static final String COLUMN_FOREIGN_KEY = "recipe_id";
@@ -50,5 +53,15 @@ public class Step {
     @ColumnInfo(name = COLUMN_THUMBNAIL_URL)
     @SerializedName("thumbnailURL")
     public String thumbnailURL;
+
+    @Override
+    public int getType() {
+        return RecipeDetail.TYPE_STEP;
+    }
+
+    @Override
+    public String getTitle() {
+        return TITLE;
+    }
 
 }

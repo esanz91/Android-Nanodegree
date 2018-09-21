@@ -7,8 +7,10 @@ import com.esanz.nano.ezbaking.respository.db.RecipeDao;
 import com.esanz.nano.ezbaking.respository.db.RecipeDb;
 import com.esanz.nano.ezbaking.respository.model.Recipe;
 
+import java.util.Collections;
 import java.util.List;
 
+import io.reactivex.Flowable;
 import io.reactivex.Single;
 import timber.log.Timber;
 
@@ -33,13 +35,17 @@ public class RecipeRepository {
         return INSTANCE;
     }
 
+    // fetch from api, fallback to db
     public Single<List<Recipe>> getRecipes() {
         return mRecipeApi.getRecipes()
                 .doOnSuccess(mRecipeDao::insertRecipes)
-                .onErrorResumeNext(e -> {
-                    Timber.e(e);
-                    return Single.just(mRecipeDao.getRecipes());
-                });
+                .doOnError(Timber::e)
+                .onErrorResumeNext(err -> mRecipeDao.getRecipes().first(Collections.emptyList()));
+    }
+
+    // fetch from db
+    public Flowable<Recipe> getRecipe(final int id) {
+        return mRecipeDao.getRecipe(id);
     }
 
 }
