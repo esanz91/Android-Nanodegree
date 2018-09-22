@@ -6,18 +6,30 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.widget.FrameLayout;
 
+import com.esanz.nano.ezbaking.EzBakingApplication;
 import com.esanz.nano.ezbaking.R;
 import com.esanz.nano.ezbaking.respository.model.Recipe;
+import com.esanz.nano.ezbaking.respository.model.Step;
 import com.esanz.nano.ezbaking.utils.FragmentUtils;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 
 public class RecipeDetailActivity extends AppCompatActivity
         implements RecipeDetailFragment.OnStepClickListener {
 
     private static final String EXTRA_RECIPE_ID = "recipe_id";
+    private static final String TAG_RECIPE_DETAIL = "recipe_detail";
+    private static final String TAG_RECIPE_STEP = "recipe_step";
+
+    private final CompositeDisposable disposables = new CompositeDisposable();
+
+    private boolean mIsTwoPane = false;
 
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
@@ -37,17 +49,58 @@ public class RecipeDetailActivity extends AppCompatActivity
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        if (savedInstanceState == null) {
-            RecipeDetailFragment fragment = new RecipeDetailFragment();
-            fragment.setArguments(FragmentUtils.intentToArguments(getIntent()));
+        determinePaneLayout();
+
+        if (null == savedInstanceState) {
+            RecipeDetailFragment detailFragment = new RecipeDetailFragment();
+            detailFragment.setArguments(FragmentUtils.intentToArguments(getIntent()));
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.container, fragment, "recipe_detail")
+                    .replace(R.id.recipe_detail_container, detailFragment, TAG_RECIPE_DETAIL)
                     .commit();
+            if (mIsTwoPane) {
+                int recipeId = getIntent().getIntExtra(EXTRA_RECIPE_ID, -1);
+                if (recipeId != -1) {
+                    disposables.add(EzBakingApplication.RECIPE_REPOSITORY.getRecipe(recipeId)
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(recipe -> initStep(recipe.steps.get(0))));
+                }
+            }
         }
     }
 
     @Override
-    public void onStepClick(final int recipeId, final int stepId) {
-        startActivity(RecipeStepsActivity.createIntent(this, recipeId, stepId));
+    protected void onDestroy() {
+        disposables.dispose();
+
+        super.onDestroy();
+    }
+
+    @Override
+    public void onStepClick(final int recipeId, @NonNull final Step step) {
+        if (mIsTwoPane) {
+            RecipeStepFragment stepFragment = (RecipeStepFragment) getSupportFragmentManager()
+                    .findFragmentByTag(TAG_RECIPE_STEP);
+            if (null == stepFragment) {
+                initStep(step);
+            } else {
+                stepFragment.bindStep(step);
+            }
+        } else {
+            startActivity(RecipeStepsActivity.createIntent(this, recipeId, step.id));
+        }
+    }
+
+    private void determinePaneLayout() {
+        FrameLayout stepFragment = findViewById(R.id.recipe_step_container);
+        if (stepFragment != null) {
+            mIsTwoPane = true;
+        }
+    }
+
+    private void initStep(@NonNull final Step step) {
+        RecipeStepFragment stepFragment = RecipeStepFragment.newInstance(step);
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.recipe_step_container, stepFragment, TAG_RECIPE_STEP)
+                .commit();
     }
 }

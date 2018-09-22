@@ -19,6 +19,7 @@ import butterknife.Unbinder;
 public class RecipeStepFragment extends Fragment {
 
     private static final String ARG_STEP = "step";
+    private static final String STATE_STEP = "step";
 
     private Step mStep;
     private Unbinder mUnbinder;
@@ -57,7 +58,20 @@ public class RecipeStepFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        bindStep(mStep);
+
+        if (null != savedInstanceState) {
+            mStep = savedInstanceState.getParcelable(STATE_STEP);
+        }
+
+        if (null != mStep) {
+            bindStep(mStep);
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        outState.putParcelable(STATE_STEP, mStep);
+        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -66,8 +80,9 @@ public class RecipeStepFragment extends Fragment {
         super.onDestroyView();
     }
 
-    private void bindStep(Step step) {
+    public void bindStep(@NonNull final Step step) {
         // TODO add video
+        mStep = step;
         mDescription.setText(step.description);
     }
 }

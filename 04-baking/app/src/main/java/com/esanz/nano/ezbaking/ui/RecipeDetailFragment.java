@@ -46,7 +46,7 @@ public class RecipeDetailFragment extends Fragment
     RecyclerView mContent;
 
     public interface OnStepClickListener {
-        void onStepClick(final int recipeId, final int stepId);
+        void onStepClick(final int recipeId, final Step step);
     }
 
     public RecipeDetailFragment() {
@@ -115,8 +115,8 @@ public class RecipeDetailFragment extends Fragment
     }
 
     @Override
-    public void onStepClick(int stepId) {
-        mListener.onStepClick(mRecipeId, stepId);
+    public void onStepClick(Step step) {
+        mListener.onStepClick(mRecipeId, step);
     }
 
     private void bindRecipe(final Recipe recipe) {
