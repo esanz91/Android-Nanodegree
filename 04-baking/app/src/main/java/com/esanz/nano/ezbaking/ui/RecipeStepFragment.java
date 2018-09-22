@@ -67,6 +67,7 @@ public class RecipeStepFragment extends Fragment {
     }
 
     private void bindStep(Step step) {
+        // TODO add video
         mDescription.setText(step.description);
     }
 }
