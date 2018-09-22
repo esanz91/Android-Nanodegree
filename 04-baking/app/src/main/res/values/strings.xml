@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">EZ Baking</string>
+
+    <string name="action_back">Back</string>
+    <string name="action_next">Next</string>
 </resources>

@@ -5,6 +5,8 @@ import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -38,5 +40,14 @@ public class Recipe {
     @Ignore
     @SerializedName("steps")
     public List<Step> steps;
+
+    public int getStepIndexFromId(final int stepId) {
+        for (Step step : steps) {
+            if (stepId == step.id) {
+                return step.position;
+            }
+        }
+        return -1;
+    }
 
 }
