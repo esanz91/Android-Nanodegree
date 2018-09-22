@@ -29,8 +29,10 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "com.android.support:appcompat-v7:$versions.androidSupport"
     implementation "com.android.support:cardview-v7:$versions.androidSupport"
-    implementation "com.android.support:design:$versions.androidSupport"
     implementation "com.android.support:recyclerview-v7:$versions.androidSupport"
+    implementation "com.android.support:support-core-ui:$versions.androidSupport"
+    implementation "com.android.support:support-fragment:$versions.androidSupport"
+    implementation "com.android.support:design:$versions.androidSupport"
     implementation "com.android.support.constraint:constraint-layout:$versions.constraintLayout"
 
     implementation "android.arch.lifecycle:extensions:$versions.archLifecycle"

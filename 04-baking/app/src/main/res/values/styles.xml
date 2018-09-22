@@ -10,4 +10,14 @@
         <item name="windowNoTitle">true</item>
     </style>
 
+    <style name="Pager.AppTheme" parent="AppTheme">
+        <item name="buttonStyle">@style/NavigationButton</item>
+    </style>
+
+    <style name="NavigationButton" parent="Widget.AppCompat.Button.Borderless">
+        <item name="android:drawableTint">@color/button_text_selector</item>
+        <item name="android:textColor">@color/button_text_selector</item>
+        <item name="android:enabled">false</item>
+    </style>
+
 </resources>

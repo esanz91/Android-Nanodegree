@@ -31,12 +31,12 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
-
-public class RecipeDetailFragment extends Fragment {
+public class RecipeDetailFragment extends Fragment
+    implements DetailsAdapter.OnStepClickListener {
 
     public static final String ARG_RECIPE_ID = "recipe_id";
 
-    private DetailsAdapter mDetailsAdapter = new DetailsAdapter();
+    private DetailsAdapter mDetailsAdapter;
     private RecipeViewModel mRecipeViewModel;
     private OnStepClickListener mListener;
     private Unbinder mUnbinder;
@@ -46,7 +46,7 @@ public class RecipeDetailFragment extends Fragment {
     RecyclerView mContent;
 
     public interface OnStepClickListener {
-        void onStepClick(); // TODO
+        void onStepClick(final int recipeId, final int stepId);
     }
 
     public RecipeDetailFragment() {
@@ -77,6 +77,12 @@ public class RecipeDetailFragment extends Fragment {
         if (getArguments() != null) {
             mRecipeId = getArguments().getInt(ARG_RECIPE_ID);
         }
+
+        RecipeViewModelFactory recipeViewModelFactory = new RecipeViewModelFactory(
+                EzBakingApplication.RECIPE_REPOSITORY, mRecipeId);
+        mRecipeViewModel = ViewModelProviders.of(this, recipeViewModelFactory)
+                .get(RecipeViewModel.class);
+        mDetailsAdapter = new DetailsAdapter(this);
     }
 
     @Override
@@ -90,21 +96,27 @@ public class RecipeDetailFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        RecipeViewModelFactory recipeViewModelFactory = new RecipeViewModelFactory(
-                EzBakingApplication.RECIPE_REPOSITORY, mRecipeId);
-        mRecipeViewModel = ViewModelProviders.of(this, recipeViewModelFactory)
-                .get(RecipeViewModel.class);
+        mContent.setAdapter(mDetailsAdapter);
+
         mRecipeViewModel.getRecipe()
                 .observe(this, this::bindRecipe);
+    }
 
-        mContent.setAdapter(mDetailsAdapter);
+    @Override
+    public void onDestroyView() {
+        mUnbinder.unbind();
+        super.onDestroyView();
     }
 
     @Override
     public void onDetach() {
         mListener = null;
-        mUnbinder.unbind();
         super.onDetach();
+    }
+
+    @Override
+    public void onStepClick(int stepId) {
+        mListener.onStepClick(mRecipeId, stepId);
     }
 
     private void bindRecipe(final Recipe recipe) {
@@ -121,7 +133,7 @@ public class RecipeDetailFragment extends Fragment {
         }
         if (null != recipe.steps && !recipe.steps.isEmpty()) {
             details.add(new SectionHeader(Step.TITLE));
-            details.addAll(recipe.steps.subList(1, recipe.steps.size()));
+            details.addAll(recipe.steps);
         }
 
         mDetailsAdapter.setDetails(details);

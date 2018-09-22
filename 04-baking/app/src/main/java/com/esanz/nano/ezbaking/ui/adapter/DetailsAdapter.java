@@ -17,14 +17,23 @@ import java.util.List;
 
 public class DetailsAdapter extends RecyclerView.Adapter<SimpleViewHolder> {
 
+    public interface OnStepClickListener {
+        void onStepClick(final int stepId);
+    }
+
     private List<RecipeDetail> details;
+    private OnStepClickListener listener;
+
+    public DetailsAdapter(OnStepClickListener listener) {
+        this.listener = listener;
+    }
 
     @NonNull
     @Override
     public SimpleViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         int layout = -1;
 
-        switch(viewType) {
+        switch (viewType) {
             case RecipeDetail.TYPE_HEADER:
                 layout = R.layout.list_item_header;
                 break;
@@ -38,10 +47,16 @@ public class DetailsAdapter extends RecyclerView.Adapter<SimpleViewHolder> {
 
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(layout, parent, false);
+        SimpleViewHolder holder = new SimpleViewHolder(itemView);
 
-        // TODO add click listener if type step
+        if (RecipeDetail.TYPE_STEP == viewType) {
+            holder.onItemClick(((view, position) -> {
+                Step step = (Step) details.get(position);
+                listener.onStepClick(step.id);
+            }));
+        }
 
-        return new SimpleViewHolder(itemView);
+        return holder;
     }
 
     @Override
@@ -79,4 +94,5 @@ public class DetailsAdapter extends RecyclerView.Adapter<SimpleViewHolder> {
         this.details = details;
         notifyDataSetChanged();
     }
+
 }
