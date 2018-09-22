@@ -18,7 +18,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
 
 public class RecipeDetailActivity extends AppCompatActivity
         implements RecipeDetailFragment.OnStepClickListener {
@@ -52,11 +51,8 @@ public class RecipeDetailActivity extends AppCompatActivity
         determinePaneLayout();
 
         if (null == savedInstanceState) {
-            RecipeDetailFragment detailFragment = new RecipeDetailFragment();
-            detailFragment.setArguments(FragmentUtils.intentToArguments(getIntent()));
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.recipe_detail_container, detailFragment, TAG_RECIPE_DETAIL)
-                    .commit();
+            initDetails();
+
             if (mIsTwoPane) {
                 int recipeId = getIntent().getIntExtra(EXTRA_RECIPE_ID, -1);
                 if (recipeId != -1) {
@@ -92,9 +88,15 @@ public class RecipeDetailActivity extends AppCompatActivity
 
     private void determinePaneLayout() {
         FrameLayout stepFragment = findViewById(R.id.recipe_step_container);
-        if (stepFragment != null) {
-            mIsTwoPane = true;
-        }
+        mIsTwoPane = null != stepFragment;
+    }
+
+    private void initDetails() {
+        RecipeDetailFragment detailFragment = new RecipeDetailFragment();
+        detailFragment.setArguments(FragmentUtils.intentToArguments(getIntent()));
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.recipe_detail_container, detailFragment, TAG_RECIPE_DETAIL)
+                .commit();
     }
 
     private void initStep(@NonNull final Step step) {
