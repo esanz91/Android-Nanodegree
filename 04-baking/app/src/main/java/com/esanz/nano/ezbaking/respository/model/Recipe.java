@@ -42,8 +42,7 @@ public class Recipe {
     public List<Step> steps;
 
     public int getStepIndexFromId(final int stepId) {
-        for (int index = 0; index < steps.size(); index++) {
-            Step step = steps.get(index);
+        for (Step step : steps) {
             if (stepId == step.id) {
                 return step.position;
             }
