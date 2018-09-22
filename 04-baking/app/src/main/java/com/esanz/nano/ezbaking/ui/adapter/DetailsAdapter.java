@@ -18,7 +18,7 @@ import java.util.List;
 public class DetailsAdapter extends RecyclerView.Adapter<SimpleViewHolder> {
 
     public interface OnStepClickListener {
-        void onStepClick(final int stepId);
+        void onStepClick(final Step step);
     }
 
     private List<RecipeDetail> details;
@@ -51,8 +51,7 @@ public class DetailsAdapter extends RecyclerView.Adapter<SimpleViewHolder> {
 
         if (RecipeDetail.TYPE_STEP == viewType) {
             holder.onItemClick(((view, position) -> {
-                Step step = (Step) details.get(position);
-                listener.onStepClick(step.id);
+                listener.onStepClick((Step) details.get(position));
             }));
         }
 
