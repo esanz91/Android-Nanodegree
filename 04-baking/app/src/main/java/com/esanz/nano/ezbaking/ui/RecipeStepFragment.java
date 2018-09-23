@@ -15,7 +15,6 @@ import android.widget.TextView;
 import com.esanz.nano.ezbaking.R;
 import com.esanz.nano.ezbaking.respository.model.Step;
 import com.esanz.nano.ezbaking.utils.ViewUtils;
-import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
@@ -154,7 +153,12 @@ public class RecipeStepFragment extends Fragment {
     public void bindStep(@NonNull final Step step, boolean reset) {
         if (reset) {
             mStep = step;
-            if (mStep.hasVideoUrl()) initializePlayer();
+            if (mStep.hasVideoUrl()) {
+                mVideoAutoPlay = true;
+                initializePlayer();
+            } else {
+                pausePlayer();
+            }
         }
 
         mPlayerView.setVisibility(mStep.hasVideoUrl() ? View.VISIBLE : View.GONE);
