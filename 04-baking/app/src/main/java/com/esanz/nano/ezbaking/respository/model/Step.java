@@ -8,6 +8,7 @@ import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.text.TextUtils;
 
 import com.esanz.nano.ezbaking.respository.RecipeDetail;
 import com.google.gson.annotations.SerializedName;
@@ -106,5 +107,9 @@ public class Step implements RecipeDetail, Parcelable {
         dest.writeString(shortDescription);
         dest.writeString(videoURL);
         dest.writeString(thumbnailURL);
+    }
+
+    public boolean hasVideoUrl() {
+        return !TextUtils.isEmpty(videoURL);
     }
 }

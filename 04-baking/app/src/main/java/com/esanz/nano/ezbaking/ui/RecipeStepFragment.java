@@ -1,5 +1,8 @@
 package com.esanz.nano.ezbaking.ui;
 
+import android.content.Context;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -11,6 +14,21 @@ import android.widget.TextView;
 
 import com.esanz.nano.ezbaking.R;
 import com.esanz.nano.ezbaking.respository.model.Step;
+import com.esanz.nano.ezbaking.utils.ViewUtils;
+import com.google.android.exoplayer2.C;
+import com.google.android.exoplayer2.ExoPlayerFactory;
+import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.source.ExtractorMediaSource;
+import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
+import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
+import com.google.android.exoplayer2.trackselection.TrackSelection;
+import com.google.android.exoplayer2.ui.PlayerView;
+import com.google.android.exoplayer2.upstream.BandwidthMeter;
+import com.google.android.exoplayer2.upstream.DataSource;
+import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
+import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
+import com.google.android.exoplayer2.util.Util;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -20,9 +38,18 @@ public class RecipeStepFragment extends Fragment {
 
     private static final String ARG_STEP = "step";
     private static final String STATE_STEP = "step";
+    private static final String STATE_VIDEO_AUTO_PLAY = "video_auto_play";
+
+    private boolean mVideoAutoPlay = true;
 
     private Step mStep;
+    private SimpleExoPlayer mPlayer;
+    private DefaultTrackSelector mTrackSelector;
+    private MediaSource mMediaSource;
     private Unbinder mUnbinder;
+
+    @BindView(R.id.player_view)
+    PlayerView mPlayerView;
 
     @BindView(R.id.description)
     TextView mDescription;
@@ -61,16 +88,60 @@ public class RecipeStepFragment extends Fragment {
 
         if (null != savedInstanceState) {
             mStep = savedInstanceState.getParcelable(STATE_STEP);
+            mVideoAutoPlay = savedInstanceState.getBoolean(STATE_VIDEO_AUTO_PLAY);
         }
 
         if (null != mStep) {
-            bindStep(mStep);
+            bindStep(mStep, false);
+        }
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (!isVisibleToUser) {
+            pausePlayer();
+        }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (mStep.hasVideoUrl() && Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
+            initializePlayer();
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (mStep.hasVideoUrl() && (Build.VERSION.SDK_INT <= Build.VERSION_CODES.M || mPlayer == null)) {
+            initializePlayer();
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (mStep.hasVideoUrl() && Build.VERSION.SDK_INT <= Build.VERSION_CODES.M) {
+            releasePlayer();
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (mStep.hasVideoUrl() && Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
+            releasePlayer();
         }
     }
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         outState.putParcelable(STATE_STEP, mStep);
+        if (null != mPlayer) {
+            outState.putBoolean(STATE_VIDEO_AUTO_PLAY, mPlayer.getPlayWhenReady());
+        }
         super.onSaveInstanceState(outState);
     }
 
@@ -80,9 +151,55 @@ public class RecipeStepFragment extends Fragment {
         super.onDestroyView();
     }
 
-    public void bindStep(@NonNull final Step step) {
-        // TODO add video
-        mStep = step;
-        mDescription.setText(step.description);
+    public void bindStep(@NonNull final Step step, boolean reset) {
+        if (reset) {
+            mStep = step;
+            if (mStep.hasVideoUrl()) initializePlayer();
+        }
+
+        mPlayerView.setVisibility(mStep.hasVideoUrl() ? View.VISIBLE : View.GONE);
+        mDescription.setText(mStep.description);
     }
+
+    private void initializePlayer() {
+        if (null == mPlayer) {
+            BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
+            TrackSelection.Factory videoTrackSelectionFactory = new AdaptiveTrackSelection.Factory(bandwidthMeter);
+            mTrackSelector = new DefaultTrackSelector(videoTrackSelectionFactory);
+            mPlayer = ExoPlayerFactory.newSimpleInstance(getContext(), mTrackSelector);
+            mPlayerView.setPlayer(mPlayer);
+        }
+
+        mMediaSource = getMediaSource(Uri.parse(mStep.videoURL));
+        mPlayer.prepare(mMediaSource);
+        mPlayer.setPlayWhenReady(mVideoAutoPlay);
+    }
+
+    private MediaSource getMediaSource(@NonNull final Uri videoUri) {
+        Context context = getContext();
+        DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
+        DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(context,
+                Util.getUserAgent(getContext(), ViewUtils.getApplicationName(context)),
+                bandwidthMeter);
+        return new ExtractorMediaSource.Factory(dataSourceFactory)
+                .createMediaSource(videoUri);
+    }
+
+    private void releasePlayer() {
+        if (null != mPlayer) {
+            mPlayerView.setPlayer(null);
+            mPlayer.release();
+            mPlayer = null;
+            mMediaSource = null;
+            mTrackSelector = null;
+        }
+    }
+
+    private void pausePlayer() {
+        if (null != mPlayer) {
+            mPlayer.setPlayWhenReady(false);
+            mVideoAutoPlay = mPlayer.getPlayWhenReady();
+        }
+    }
+
 }

@@ -79,7 +79,7 @@ public class RecipeDetailActivity extends AppCompatActivity
             if (null == stepFragment) {
                 initStep(step);
             } else {
-                stepFragment.bindStep(step);
+                stepFragment.bindStep(step, true);
             }
         } else {
             startActivity(RecipeStepsActivity.createIntent(this, recipeId, step.id));
