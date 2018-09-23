@@ -34,6 +34,9 @@ public class RecipeStepsActivity extends AppCompatActivity {
     private RecipeViewModel mRecipeViewModel;
     private FragmentStatePagerAdapter mPagerAdaper;
 
+    @BindView(R.id.root)
+    View mRoot;
+
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
 
@@ -139,5 +142,13 @@ public class RecipeStepsActivity extends AppCompatActivity {
             mBackButton.setEnabled(true);
             mNextButton.setEnabled(true);
         }
+    }
+
+    public void showViewPagerNavigation(boolean show) {
+        int visibility = show ? View.VISIBLE : View.GONE;
+        mBackButton.setVisibility(visibility);
+        mNextButton.setVisibility(visibility);
+        mProgressBar.setVisibility(visibility);
+        mRoot.setFitsSystemWindows(show);
     }
 }

@@ -1,6 +1,7 @@
 package com.esanz.nano.ezbaking.ui;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -15,6 +16,7 @@ import android.widget.TextView;
 import com.esanz.nano.ezbaking.R;
 import com.esanz.nano.ezbaking.respository.model.Step;
 import com.esanz.nano.ezbaking.utils.ViewUtils;
+import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
@@ -38,8 +40,12 @@ public class RecipeStepFragment extends Fragment {
     private static final String ARG_STEP = "step";
     private static final String STATE_STEP = "step";
     private static final String STATE_VIDEO_AUTO_PLAY = "video_auto_play";
+    private static final String STATE_VIDEO_POSITION = "video_position";
+    private static final String STATE_WINDOW_POSITION = "window_position";
 
     private boolean mVideoAutoPlay = true;
+    private long mVideoPosition = C.TIME_UNSET;
+    private int mWindowPosition = C.INDEX_UNSET;
 
     private Step mStep;
     private SimpleExoPlayer mPlayer;
@@ -71,6 +77,18 @@ public class RecipeStepFragment extends Fragment {
         if (getArguments() != null) {
             mStep = getArguments().getParcelable(ARG_STEP);
         }
+
+        View decorView = getActivity().getWindow().getDecorView();
+        decorView.setOnSystemUiVisibilityChangeListener
+                (visibility -> {
+                    if ((visibility & View.SYSTEM_UI_FLAG_FULLSCREEN) != 0) {
+                        RecipeStepsActivity activity = (RecipeStepsActivity) getActivity();
+                        if (null != activity) {
+                            activity.getSupportActionBar().hide();
+                            activity.showViewPagerNavigation(false);
+                        }
+                    }
+                });
     }
 
     @Override
@@ -88,6 +106,8 @@ public class RecipeStepFragment extends Fragment {
         if (null != savedInstanceState) {
             mStep = savedInstanceState.getParcelable(STATE_STEP);
             mVideoAutoPlay = savedInstanceState.getBoolean(STATE_VIDEO_AUTO_PLAY);
+            mVideoPosition = savedInstanceState.getLong(STATE_VIDEO_POSITION);
+            mWindowPosition = savedInstanceState.getInt(STATE_WINDOW_POSITION);
         }
 
         if (null != mStep) {
@@ -136,10 +156,30 @@ public class RecipeStepFragment extends Fragment {
     }
 
     @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            hideSystemUI();
+        } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            showSystemUI();
+
+            RecipeStepsActivity activity = (RecipeStepsActivity) getActivity();
+            if (null != activity) {
+                activity.getSupportActionBar().show();
+                activity.showViewPagerNavigation(true);
+            }
+        }
+    }
+
+    @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         outState.putParcelable(STATE_STEP, mStep);
         if (null != mPlayer) {
-            outState.putBoolean(STATE_VIDEO_AUTO_PLAY, mPlayer.getPlayWhenReady());
+            updateStartPosition();
+            outState.putBoolean(STATE_VIDEO_AUTO_PLAY, mVideoAutoPlay);
+            outState.putLong(STATE_VIDEO_POSITION, mVideoPosition);
+            outState.putInt(STATE_WINDOW_POSITION, mWindowPosition);
         }
         super.onSaveInstanceState(outState);
     }
@@ -174,8 +214,13 @@ public class RecipeStepFragment extends Fragment {
             mPlayerView.setPlayer(mPlayer);
         }
 
+        boolean haveStartPosition = mWindowPosition != C.INDEX_UNSET;
+        if (haveStartPosition) {
+            mPlayer.seekTo(mWindowPosition, mVideoPosition);
+        }
+
         mMediaSource = getMediaSource(Uri.parse(mStep.videoURL));
-        mPlayer.prepare(mMediaSource);
+        mPlayer.prepare(mMediaSource, !haveStartPosition, false);
         mPlayer.setPlayWhenReady(mVideoAutoPlay);
     }
 
@@ -189,8 +234,17 @@ public class RecipeStepFragment extends Fragment {
                 .createMediaSource(videoUri);
     }
 
+    private void updateStartPosition() {
+        if (mPlayer != null) {
+            mVideoAutoPlay = mPlayer.getPlayWhenReady();
+            mVideoPosition = Math.max(0, mPlayer.getContentPosition());
+            mWindowPosition = mPlayer.getCurrentWindowIndex();
+        }
+    }
+
     private void releasePlayer() {
         if (null != mPlayer) {
+            updateStartPosition();
             mPlayerView.setPlayer(null);
             mPlayer.release();
             mPlayer = null;
@@ -204,6 +258,23 @@ public class RecipeStepFragment extends Fragment {
             mPlayer.setPlayWhenReady(false);
             mVideoAutoPlay = mPlayer.getPlayWhenReady();
         }
+    }
+
+    private void hideSystemUI() {
+        View decorView = getActivity().getWindow().getDecorView();
+        int uiOptions = View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // hide nav bar
+                | View.SYSTEM_UI_FLAG_FULLSCREEN // hide status bar
+                | View.SYSTEM_UI_FLAG_IMMERSIVE;
+        decorView.setSystemUiVisibility(uiOptions);
+    }
+
+    private void showSystemUI() {
+        View decorView = getActivity().getWindow().getDecorView();
+        int uiOptions = View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
+        decorView.setSystemUiVisibility(uiOptions);
     }
 
 }
