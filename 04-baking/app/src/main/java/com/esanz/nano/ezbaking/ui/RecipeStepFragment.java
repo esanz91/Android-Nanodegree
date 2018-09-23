@@ -17,7 +17,6 @@ import com.esanz.nano.ezbaking.respository.model.Step;
 import com.esanz.nano.ezbaking.utils.ViewUtils;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlayerFactory;
-import com.google.android.exoplayer2.PlaybackPreparer;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
@@ -35,17 +34,12 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
-public class RecipeStepFragment extends Fragment
-        implements PlaybackPreparer {
+public class RecipeStepFragment extends Fragment {
 
     private static final String ARG_STEP = "step";
     private static final String STATE_STEP = "step";
-
-    // TODO save exoplayer state correctly on orientation change for tablet layouts
-    // saving video position not working (also tried window position)
-    private static final String STATE_VIDEO_POSITION = "video_position";
     private static final String STATE_VIDEO_AUTO_PLAY = "video_auto_play";
-    private long mVideoPosition = C.TIME_UNSET;
+
     private boolean mVideoAutoPlay = true;
 
     private Step mStep;
@@ -94,7 +88,6 @@ public class RecipeStepFragment extends Fragment
 
         if (null != savedInstanceState) {
             mStep = savedInstanceState.getParcelable(STATE_STEP);
-            mVideoPosition = savedInstanceState.getLong(STATE_VIDEO_POSITION);
             mVideoAutoPlay = savedInstanceState.getBoolean(STATE_VIDEO_AUTO_PLAY);
         }
 
@@ -147,7 +140,6 @@ public class RecipeStepFragment extends Fragment
     public void onSaveInstanceState(@NonNull Bundle outState) {
         outState.putParcelable(STATE_STEP, mStep);
         if (null != mPlayer) {
-            outState.putLong(STATE_VIDEO_POSITION, Math.max(0, mPlayer.getContentPosition()));
             outState.putBoolean(STATE_VIDEO_AUTO_PLAY, mPlayer.getPlayWhenReady());
         }
         super.onSaveInstanceState(outState);
@@ -157,11 +149,6 @@ public class RecipeStepFragment extends Fragment
     public void onDestroyView() {
         mUnbinder.unbind();
         super.onDestroyView();
-    }
-
-    @Override
-    public void preparePlayback() {
-        initializePlayer();
     }
 
     public void bindStep(@NonNull final Step step, boolean reset) {
@@ -180,17 +167,12 @@ public class RecipeStepFragment extends Fragment
             TrackSelection.Factory videoTrackSelectionFactory = new AdaptiveTrackSelection.Factory(bandwidthMeter);
             mTrackSelector = new DefaultTrackSelector(videoTrackSelectionFactory);
             mPlayer = ExoPlayerFactory.newSimpleInstance(getContext(), mTrackSelector);
-
             mPlayerView.setPlayer(mPlayer);
-            mPlayerView.setPlaybackPreparer(this);
         }
 
         mMediaSource = getMediaSource(Uri.parse(mStep.videoURL));
         mPlayer.prepare(mMediaSource);
         mPlayer.setPlayWhenReady(mVideoAutoPlay);
-        if (mVideoPosition != C.TIME_UNSET) {
-            mPlayer.seekTo(mVideoPosition);
-        }
     }
 
     private MediaSource getMediaSource(@NonNull final Uri videoUri) {
@@ -216,7 +198,6 @@ public class RecipeStepFragment extends Fragment
     private void pausePlayer() {
         if (null != mPlayer) {
             mPlayer.setPlayWhenReady(false);
-            mVideoPosition = Math.max(0, mPlayer.getContentPosition());
             mVideoAutoPlay = mPlayer.getPlayWhenReady();
         }
     }
