@@ -57,6 +57,7 @@ dependencies {
     annotationProcessor "com.jakewharton:butterknife-compiler:$versions.butterknife"
 
     implementation "com.squareup.picasso:picasso:$versions.picasso"
+    implementation "com.google.android.exoplayer:exoplayer:$versions.exoplayer"
 
     testImplementation "junit:junit:$versions.junit"
     androidTestImplementation "com.android.support.test:runner:$versions.runner"
