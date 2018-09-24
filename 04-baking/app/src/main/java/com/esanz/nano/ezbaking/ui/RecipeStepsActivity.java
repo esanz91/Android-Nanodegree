@@ -77,6 +77,7 @@ public class RecipeStepsActivity extends AppCompatActivity {
             @Override
             public void onPageSelected(int stepIndex) {
                 setUpNavigation(stepIndex);
+                mProgressBar.setProgress(stepIndex);
             }
         });
 
@@ -86,7 +87,7 @@ public class RecipeStepsActivity extends AppCompatActivity {
                 .get(RecipeViewModel.class);
 
         mRecipeViewModel.getRecipe()
-                .observe(this, (Recipe recipe) -> {
+                .observe(this, recipe -> {
                     getSupportActionBar().setTitle(recipe.name);
 
                     if (null == mPagerAdaper) {
@@ -95,7 +96,8 @@ public class RecipeStepsActivity extends AppCompatActivity {
 
                     int currentStep = recipe.getStepIndexFromId(mStepId);
                     int totalSteps = mPagerAdaper.getCount();
-                    mProgressBar.setProgress(currentStep / totalSteps);
+                    mProgressBar.setMax(totalSteps - 1);
+                    mProgressBar.setProgress(currentStep);
                     mPager.setCurrentItem(currentStep);
                     setUpNavigation(currentStep);
                 });
