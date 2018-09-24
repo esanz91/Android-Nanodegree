@@ -3,11 +3,12 @@ package com.esanz.nano.ezbaking;
 import android.app.Application;
 
 import com.esanz.nano.ezbaking.respository.RecipeRepository;
+import com.esanz.nano.ezbaking.respository.api.OkHttpClientProvider;
 import com.esanz.nano.ezbaking.respository.api.RecipeApi;
 import com.esanz.nano.ezbaking.respository.api.RetrofitClient;
 import com.esanz.nano.ezbaking.respository.db.RecipeDb;
 
-import retrofit2.Retrofit;
+import okhttp3.OkHttpClient;
 import timber.log.Timber;
 
 public class EzBakingApplication extends Application {
@@ -18,7 +19,8 @@ public class EzBakingApplication extends Application {
     public void onCreate() {
         super.onCreate();
 
-        RecipeApi recipeApi = RetrofitClient.getInstance().create(RecipeApi.class);
+        OkHttpClient okHttpClient = OkHttpClientProvider.getInstance();
+        RecipeApi recipeApi = RetrofitClient.getInstance(okHttpClient).create(RecipeApi.class);
         RecipeDb recipeDb = RecipeDb.getInstance(getApplicationContext());
         RECIPE_REPOSITORY = RecipeRepository.getInstance(recipeApi, recipeDb);
 

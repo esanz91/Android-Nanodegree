@@ -8,7 +8,6 @@ import android.support.v7.widget.Toolbar;
 
 import com.esanz.nano.ezbaking.EzBakingApplication;
 import com.esanz.nano.ezbaking.R;
-import com.esanz.nano.ezbaking.respository.RecipeRepository;
 import com.esanz.nano.ezbaking.ui.adapter.RecipesAdapter;
 import com.esanz.nano.ezbaking.ui.viewmodel.RecipesViewModel;
 import com.esanz.nano.ezbaking.ui.viewmodel.RecipesViewModelFactory;
