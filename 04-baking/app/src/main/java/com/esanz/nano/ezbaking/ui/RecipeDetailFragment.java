@@ -42,7 +42,7 @@ public class RecipeDetailFragment extends Fragment
     private Unbinder mUnbinder;
     private int mRecipeId;
 
-    @BindView(R.id.content)
+    @BindView(R.id.details)
     RecyclerView mContent;
 
     public interface OnStepClickListener {

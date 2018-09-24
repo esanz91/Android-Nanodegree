@@ -26,5 +26,6 @@ ext {
             junit               : '4.12',
             runner              : '1.0.2',
             espresso            : '3.0.2',
+            okhttpIdling        : '1.0.0',
     ]
 }

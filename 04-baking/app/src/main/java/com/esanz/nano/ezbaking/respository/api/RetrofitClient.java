@@ -1,5 +1,8 @@
 package com.esanz.nano.ezbaking.respository.api;
 
+import android.os.AsyncTask;
+import android.support.annotation.NonNull;
+
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.schedulers.Schedulers;
@@ -18,26 +21,17 @@ public class RetrofitClient {
     private RetrofitClient() {
     }
 
-    public static Retrofit getInstance() {
+    public static Retrofit getInstance(@NonNull final OkHttpClient okHttpClient) {
         if (null == RETROFIT_INSTANCE) {
             RETROFIT_INSTANCE = new Retrofit.Builder()
                     .baseUrl(BASE_MOVIE_URL)
                     .addConverterFactory(GsonConverterFactory.create())
-                    .addCallAdapterFactory(RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
-                    .client(createClient())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory
+                            .createWithScheduler(Schedulers.from(AsyncTask.THREAD_POOL_EXECUTOR)))
+                    .client(okHttpClient)
                     .build();
         }
         return RETROFIT_INSTANCE;
-    }
-
-    private static OkHttpClient createClient() {
-        return new OkHttpClient.Builder()
-                .connectTimeout(30, TimeUnit.SECONDS)
-                .readTimeout(30, TimeUnit.SECONDS)
-                .writeTimeout(30, TimeUnit.SECONDS)
-                .addInterceptor(new HttpLoggingInterceptor(new TimberHttpLogger())
-                        .setLevel(HttpLoggingInterceptor.Level.BODY))
-                .build();
     }
 
 }
