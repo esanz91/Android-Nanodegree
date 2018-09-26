@@ -12,7 +12,6 @@ import com.esanz.nano.ezbaking.EzBakingApplication;
 import com.esanz.nano.ezbaking.R;
 import com.esanz.nano.ezbaking.respository.model.Recipe;
 import com.esanz.nano.ezbaking.respository.model.Step;
-import com.esanz.nano.ezbaking.utils.FragmentUtils;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -29,6 +28,7 @@ public class RecipeDetailActivity extends AppCompatActivity
     private final CompositeDisposable disposables = new CompositeDisposable();
 
     private boolean mIsTwoPane = false;
+    private int mRecipeId;
 
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
@@ -48,15 +48,16 @@ public class RecipeDetailActivity extends AppCompatActivity
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        mRecipeId = getIntent().getIntExtra(EXTRA_RECIPE_ID, -1);
+
         determinePaneLayout();
 
         if (null == savedInstanceState) {
             initDetails();
 
             if (mIsTwoPane) {
-                int recipeId = getIntent().getIntExtra(EXTRA_RECIPE_ID, -1);
-                if (recipeId != -1) {
-                    disposables.add(EzBakingApplication.RECIPE_REPOSITORY.getRecipe(recipeId)
+                if (mRecipeId != -1) {
+                    disposables.add(EzBakingApplication.RECIPE_REPOSITORY.getRecipe(mRecipeId)
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe(recipe -> initStep(recipe.steps.get(0))));
                 }
@@ -92,8 +93,7 @@ public class RecipeDetailActivity extends AppCompatActivity
     }
 
     private void initDetails() {
-        RecipeDetailFragment detailFragment = new RecipeDetailFragment();
-        detailFragment.setArguments(FragmentUtils.intentToArguments(getIntent()));
+        RecipeDetailFragment detailFragment = RecipeDetailFragment.newInstance(mRecipeId);
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.recipe_detail_container, detailFragment, TAG_RECIPE_DETAIL)
                 .commit();

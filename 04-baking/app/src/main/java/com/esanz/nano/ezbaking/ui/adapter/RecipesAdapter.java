@@ -12,7 +12,9 @@ import android.widget.TextView;
 
 import com.esanz.nano.ezbaking.R;
 import com.esanz.nano.ezbaking.respository.model.Recipe;
+import com.esanz.nano.ezbaking.service.RecipeWidgetIntentService;
 import com.esanz.nano.ezbaking.ui.RecipeDetailActivity;
+import com.esanz.nano.ezbaking.utils.PreferenceUtils;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -24,12 +26,17 @@ public class RecipesAdapter extends RecyclerView.Adapter<SimpleViewHolder> {
     @NonNull
     @Override
     public SimpleViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View itemView = LayoutInflater.from(parent.getContext())
+        final Context context = parent.getContext();
+        View itemView = LayoutInflater.from(context)
                 .inflate(R.layout.list_item_recipe, parent, false);
         SimpleViewHolder holder = new SimpleViewHolder(itemView);
-        Context context = parent.getContext();
-        holder.onItemClick((v, position) ->
-                context.startActivity(RecipeDetailActivity.createIntent(context, recipes.get(position))));
+        holder.onItemClick((v, position) -> {
+            Recipe recipe = recipes.get(position);
+            PreferenceUtils.storeLastSeenRecipe(context, recipe.id);
+            RecipeWidgetIntentService.startActionUpdateWidgetRecipe(context);
+            context.startActivity(RecipeDetailActivity.createIntent(context, recipe));
+        });
+
         return holder;
     }
 
