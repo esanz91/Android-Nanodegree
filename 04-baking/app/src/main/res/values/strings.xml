@@ -3,4 +3,7 @@
 
     <string name="action_back">Back</string>
     <string name="action_next">Next</string>
+    <string name="action_select_recipe">Click to select a recipe</string>
+
+    <string name="widget_title">EzBaking</string>
 </resources>

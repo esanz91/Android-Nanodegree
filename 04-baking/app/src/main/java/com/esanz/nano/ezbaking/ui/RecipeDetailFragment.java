@@ -53,10 +53,10 @@ public class RecipeDetailFragment extends Fragment
         // Required empty public constructor
     }
 
-    public static RecipeDetailFragment newInstance(String recipeId) {
+    public static RecipeDetailFragment newInstance(int recipeId) {
         RecipeDetailFragment fragment = new RecipeDetailFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_RECIPE_ID, recipeId);
+        args.putInt(ARG_RECIPE_ID, recipeId);
         fragment.setArguments(args);
         return fragment;
     }
