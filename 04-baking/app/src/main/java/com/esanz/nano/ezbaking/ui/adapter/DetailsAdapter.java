@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.esanz.nano.ezbaking.R;
+import com.esanz.nano.ezbaking.components.SimpleViewHolder;
 import com.esanz.nano.ezbaking.respository.RecipeDetail;
 import com.esanz.nano.ezbaking.respository.model.Ingredient;
 import com.esanz.nano.ezbaking.respository.model.SectionHeader;
