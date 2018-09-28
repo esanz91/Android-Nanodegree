@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
         mRecipesViewModel = ViewModelProviders.of(this, recipesViewModelFactory)
                 .get(RecipesViewModel.class);
         mRecipesViewModel.getRecipes()
-                .observe(this, recipes -> mRecipesAdapter.setRecipes(recipes));
+                .observe(this, recipes -> mRecipesAdapter.setItems(recipes));
     }
 
 }

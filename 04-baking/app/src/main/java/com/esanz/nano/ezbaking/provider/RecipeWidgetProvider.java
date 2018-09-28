@@ -1,36 +1,46 @@
-package com.esanz.nano.ezbaking;
+package com.esanz.nano.ezbaking.provider;
 
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.widget.RemoteViews;
 
+import com.esanz.nano.ezbaking.R;
 import com.esanz.nano.ezbaking.respository.model.Recipe;
+import com.esanz.nano.ezbaking.service.ListWidgetService;
 import com.esanz.nano.ezbaking.ui.MainActivity;
 import com.esanz.nano.ezbaking.ui.RecipeDetailActivity;
 
 public class RecipeWidgetProvider extends AppWidgetProvider {
 
-    static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
-                                int appWidgetId, Recipe recipe) {
+    private static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
+                                        int appWidgetId, Recipe recipe) {
 
-        // Construct the RemoteViews object
-        RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.ez_baking_widget);
-
-        CharSequence widgetText = null == recipe ? context.getString(R.string.widget_title) : recipe.name;
-        views.setTextViewText(R.id.appwidget_text, widgetText);
-
-        Intent intent = new Intent(context, MainActivity.class);
-        if (null != recipe) {
-            intent = RecipeDetailActivity.createIntent(context, recipe);
-        }
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        views.setOnClickPendingIntent(R.id.appwidget_text, pendingIntent);
-
-        // Instruct the widget manager to update the widget
+        RemoteViews views = getRecipeRemoteViews(context, recipe);
         appWidgetManager.updateAppWidget(appWidgetId, views);
+    }
+
+    private static RemoteViews getRecipeRemoteViews(@NonNull final Context context, final Recipe recipe) {
+        RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.ez_baking_widget);
+        CharSequence widgetText = null == recipe ? context.getString(R.string.widget_title) : recipe.name;
+        views.setTextViewText(R.id.widget_title, widgetText);
+
+        Intent browseIntent = new Intent(context, MainActivity.class);
+        if (null != recipe) {
+            browseIntent = RecipeDetailActivity.createIntent(context, recipe);
+        }
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, browseIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        views.setOnClickPendingIntent(R.id.widget_title, pendingIntent);
+        views.setOnClickPendingIntent(R.id.empty_msg, pendingIntent);
+
+        Intent intent = new Intent(context, ListWidgetService.class);
+        views.setRemoteAdapter(R.id.widget_list_view, intent);
+        views.setEmptyView(R.id.widget_list_view, R.id.empty_msg);
+
+        return views;
     }
 
     @Override

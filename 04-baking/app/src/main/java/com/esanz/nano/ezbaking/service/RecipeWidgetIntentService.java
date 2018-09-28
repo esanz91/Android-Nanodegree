@@ -7,7 +7,8 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.esanz.nano.ezbaking.EzBakingApplication;
-import com.esanz.nano.ezbaking.RecipeWidgetProvider;
+import com.esanz.nano.ezbaking.R;
+import com.esanz.nano.ezbaking.provider.RecipeWidgetProvider;
 import com.esanz.nano.ezbaking.utils.PreferenceUtils;
 
 import timber.log.Timber;
@@ -51,6 +52,7 @@ public class RecipeWidgetIntentService extends IntentService {
                 .subscribe(recipe -> {
                     AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this);
                     int[] appWidgetIds = appWidgetManager.getAppWidgetIds(new ComponentName(this, RecipeWidgetProvider.class));
+                    appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.widget_list_view);
                     RecipeWidgetProvider.updateWidgetRecipe(this, appWidgetManager, appWidgetIds, recipe);
                 });
     }

@@ -31,7 +31,7 @@
             android:parentActivityName=".ui.RecipeDetailActivity"
             android:theme="@style/Pager.AppTheme" />
 
-        <receiver android:name=".RecipeWidgetProvider">
+        <receiver android:name=".provider.RecipeWidgetProvider">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -44,6 +44,11 @@
         <service
             android:name=".service.RecipeWidgetIntentService"
             android:exported="false" />
+
+        <service
+            android:name=".service.ListWidgetService"
+            android:permission="android.permission.BIND_REMOTEVIEWS" />
+
     </application>
 
 </manifest>
