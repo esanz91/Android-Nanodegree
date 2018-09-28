@@ -18,9 +18,6 @@ public class RecipeWidgetIntentService extends IntentService {
     public static final String TAG = RecipeWidgetIntentService.class.getSimpleName();
     public static final String ACTION_UPDATE_WIDGET_RECIPE = "com.esanz.nano.ezbaking.action.update_widget_recipe";
 
-    // TODO: Rename parameters
-    //private static final String EXTRA_PARAM1 = "com.esanz.nano.ezbaking.service.extra.PARAM1";
-
     public RecipeWidgetIntentService() {
         super(TAG);
     }
