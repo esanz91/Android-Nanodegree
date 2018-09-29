@@ -53,6 +53,7 @@ public class RecipeDetailActivity extends AppCompatActivity
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        mIsTwoPane = getResources().getBoolean(R.bool.isTablet);
         mRecipeId = getIntent().getIntExtra(EXTRA_RECIPE_ID, -1);
 
         RecipeViewModelFactory recipeViewModelFactory = new RecipeViewModelFactory(
@@ -61,7 +62,6 @@ public class RecipeDetailActivity extends AppCompatActivity
                 .get(RecipeViewModel.class);
 
 
-        determinePaneLayout();
 
         if (null == savedInstanceState) {
             initDetails();
@@ -93,11 +93,6 @@ public class RecipeDetailActivity extends AppCompatActivity
         } else {
             startActivity(RecipeStepsActivity.createIntent(this, recipeId, step.position));
         }
-    }
-
-    private void determinePaneLayout() {
-        FrameLayout stepFragment = findViewById(R.id.recipe_step_container);
-        mIsTwoPane = null != stepFragment;
     }
 
     private void initDetails() {
