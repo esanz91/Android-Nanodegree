@@ -6,8 +6,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -124,11 +122,6 @@ public class RecipeDetailFragment extends Fragment
     }
 
     private void bindRecipe(final Recipe recipe) {
-
-        ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
-        if (null != actionBar) {
-            actionBar.setTitle(recipe.name);
-        }
 
         List<RecipeDetail> details = new ArrayList<>();
         if (null != recipe.ingredients && !recipe.ingredients.isEmpty()) {
