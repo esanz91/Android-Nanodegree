@@ -30,11 +30,14 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import io.reactivex.disposables.CompositeDisposable;
 
 public class RecipeDetailFragment extends Fragment
     implements DetailsAdapter.OnStepClickListener {
 
     public static final String ARG_RECIPE_ID = "recipe_id";
+
+    private final CompositeDisposable disposables = new CompositeDisposable();
 
     private DetailsAdapter mDetailsAdapter;
     private RecipeViewModel mRecipeViewModel;
@@ -82,7 +85,7 @@ public class RecipeDetailFragment extends Fragment
                 EzBakingApplication.RECIPE_REPOSITORY, mRecipeId);
         mRecipeViewModel = ViewModelProviders.of(this, recipeViewModelFactory)
                 .get(RecipeViewModel.class);
-        mDetailsAdapter = new DetailsAdapter(this);
+        mDetailsAdapter = new DetailsAdapter(getContext(), this);
     }
 
     @Override
@@ -98,13 +101,14 @@ public class RecipeDetailFragment extends Fragment
 
         mContent.setAdapter(mDetailsAdapter);
 
-        mRecipeViewModel.getRecipe()
-                .observe(this, this::bindRecipe);
+        disposables.add(mRecipeViewModel.getRecipe()
+                .subscribe(this::bindRecipe));
     }
 
     @Override
     public void onDestroyView() {
         mUnbinder.unbind();
+        disposables.dispose();
         super.onDestroyView();
     }
 

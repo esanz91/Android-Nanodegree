@@ -1,5 +1,6 @@
 package com.esanz.nano.ezbaking.ui;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,6 +13,8 @@ import com.esanz.nano.ezbaking.EzBakingApplication;
 import com.esanz.nano.ezbaking.R;
 import com.esanz.nano.ezbaking.respository.model.Recipe;
 import com.esanz.nano.ezbaking.respository.model.Step;
+import com.esanz.nano.ezbaking.ui.viewmodel.RecipeViewModel;
+import com.esanz.nano.ezbaking.ui.viewmodel.RecipeViewModelFactory;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -28,7 +31,9 @@ public class RecipeDetailActivity extends AppCompatActivity
     private final CompositeDisposable disposables = new CompositeDisposable();
 
     private boolean mIsTwoPane = false;
+
     private int mRecipeId;
+    private RecipeViewModel mRecipeViewModel;
 
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
@@ -50,17 +55,20 @@ public class RecipeDetailActivity extends AppCompatActivity
 
         mRecipeId = getIntent().getIntExtra(EXTRA_RECIPE_ID, -1);
 
+        RecipeViewModelFactory recipeViewModelFactory = new RecipeViewModelFactory(
+                EzBakingApplication.RECIPE_REPOSITORY, mRecipeId);
+        mRecipeViewModel = ViewModelProviders.of(this, recipeViewModelFactory)
+                .get(RecipeViewModel.class);
+
+
         determinePaneLayout();
 
         if (null == savedInstanceState) {
             initDetails();
 
             if (mIsTwoPane) {
-                if (mRecipeId != -1) {
-                    disposables.add(EzBakingApplication.RECIPE_REPOSITORY.getRecipe(mRecipeId)
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe(recipe -> initStep(recipe.steps.get(0))));
-                }
+                disposables.add(mRecipeViewModel.getRecipe()
+                        .subscribe(recipe -> initStep(recipe.steps.get(0))));
             }
         }
     }
@@ -80,10 +88,10 @@ public class RecipeDetailActivity extends AppCompatActivity
             if (null == stepFragment) {
                 initStep(step);
             } else {
-                stepFragment.bindStep(step, true);
+                stepFragment.bindStep(step);
             }
         } else {
-            startActivity(RecipeStepsActivity.createIntent(this, recipeId, step.id));
+            startActivity(RecipeStepsActivity.createIntent(this, recipeId, step.position));
         }
     }
 
@@ -100,7 +108,7 @@ public class RecipeDetailActivity extends AppCompatActivity
     }
 
     private void initStep(@NonNull final Step step) {
-        RecipeStepFragment stepFragment = RecipeStepFragment.newInstance(step);
+        RecipeStepFragment stepFragment = RecipeStepFragment.newInstance(mRecipeId, step.position);
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.recipe_step_container, stepFragment, TAG_RECIPE_STEP)
                 .commit();

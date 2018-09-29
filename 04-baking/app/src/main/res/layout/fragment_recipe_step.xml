@@ -16,11 +16,10 @@
             android:id="@+id/player_view"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:visibility="invisible"
+            android:visibility="gone"
             app:layout_constraintBottom_toTopOf="@id/description"
             app:layout_constraintDimensionRatio="16:9"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_goneMarginBottom="64dp"
             tools:visibility="visible" />
 
         <TextView

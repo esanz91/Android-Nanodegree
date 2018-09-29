@@ -26,7 +26,6 @@
             android:parentActivityName=".ui.MainActivity" />
         <activity
             android:name=".ui.RecipeStepsActivity"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize|uiMode"
             android:launchMode="singleTop"
             android:parentActivityName=".ui.RecipeDetailActivity"
             android:theme="@style/Pager.AppTheme" />

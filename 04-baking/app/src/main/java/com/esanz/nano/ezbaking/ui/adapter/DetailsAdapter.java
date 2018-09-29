@@ -1,10 +1,16 @@
 package com.esanz.nano.ezbaking.ui.adapter;
 
+import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.esanz.nano.ezbaking.R;
@@ -13,6 +19,7 @@ import com.esanz.nano.ezbaking.respository.RecipeDetail;
 import com.esanz.nano.ezbaking.respository.model.Ingredient;
 import com.esanz.nano.ezbaking.respository.model.SectionHeader;
 import com.esanz.nano.ezbaking.respository.model.Step;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -24,9 +31,12 @@ public class DetailsAdapter extends RecyclerView.Adapter<SimpleViewHolder> {
 
     private List<RecipeDetail> details;
     private OnStepClickListener listener;
+    private Drawable stepThumbnail;
 
-    public DetailsAdapter(OnStepClickListener listener) {
+    public DetailsAdapter(Context context, OnStepClickListener listener) {
         this.listener = listener;
+        stepThumbnail = context.getDrawable(R.drawable.ic_baseline_movie_24px).mutate();
+        DrawableCompat.setTint(stepThumbnail, ContextCompat.getColor(context, R.color.colorPrimary));
     }
 
     @NonNull
@@ -76,6 +86,10 @@ public class DetailsAdapter extends RecyclerView.Adapter<SimpleViewHolder> {
             case RecipeDetail.TYPE_STEP:
                 Step step = (Step) detail;
                 holder.<TextView>get(R.id.step).setText(step.shortDescription);
+                Picasso.with(holder.itemView.getContext())
+                        .load(!TextUtils.isEmpty(step.thumbnailURL) ? step.thumbnailURL : null)
+                        .placeholder(stepThumbnail)
+                        .into(holder.<ImageView>get(R.id.thumbnail));
                 break;
         }
     }

@@ -6,7 +6,7 @@ ext {
             minSdk              : 21,
             targetSdk           : 28,
 
-            androidSupport      : '28.0.0-rc02',
+            androidSupport      : '28.0.0',
             archLifecycle       : '1.1.1',
             constraintLayout    : '1.1.3',
             room                : '1.1.1',
@@ -16,6 +16,7 @@ ext {
             retrofit            : '2.4.0',
             rxJava2             : '2.2.2',
             rxAndroid2          : '2.1.0',
+            rxRelay             : '2.1.0',
 
             timber              : '4.7.1',
             butterknife         : '8.8.1',

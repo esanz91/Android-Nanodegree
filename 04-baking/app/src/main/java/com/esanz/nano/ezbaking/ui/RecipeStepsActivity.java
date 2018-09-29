@@ -3,6 +3,7 @@ package com.esanz.nano.ezbaking.ui;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -27,10 +28,13 @@ import butterknife.OnClick;
 public class RecipeStepsActivity extends AppCompatActivity {
 
     private static final String EXTRA_RECIPE_ID = "recipe_id";
-    private static final String EXTRA_STEP_ID = "step_id";
+    private static final String EXTRA_STEP_POSITION = "step_position";
+
+    private static final String STATE_RECIPE_ID = "recipe_id";
+    private static final String STATE_STEP_POSITION = "step_position";
 
     private int mRecipeId;
-    private int mStepId;
+    private int mStepPosition;
     private RecipeViewModel mRecipeViewModel;
     private FragmentStatePagerAdapter mPagerAdaper;
 
@@ -54,10 +58,10 @@ public class RecipeStepsActivity extends AppCompatActivity {
 
     public static Intent createIntent(@NonNull final Context context,
                                       final int recipeId,
-                                      final int stepId) {
+                                      final int stepPosition) {
         Intent intent = new Intent(context, RecipeStepsActivity.class);
         intent.putExtra(EXTRA_RECIPE_ID, recipeId);
-        intent.putExtra(EXTRA_STEP_ID, stepId);
+        intent.putExtra(EXTRA_STEP_POSITION, stepPosition);
         return intent;
     }
 
@@ -70,14 +74,32 @@ public class RecipeStepsActivity extends AppCompatActivity {
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        mRecipeId = getIntent().getIntExtra(EXTRA_RECIPE_ID, mRecipeId);
-        mStepId = getIntent().getIntExtra(EXTRA_STEP_ID, mStepId);
+        int currentOrientation = getResources().getConfiguration().orientation;
+        if (currentOrientation == Configuration.ORIENTATION_LANDSCAPE) {
+            hideSystemUI();
+            getSupportActionBar().hide();
+            showViewPagerNavigation(false);
+        }
+        else {
+            showSystemUI();
+            getSupportActionBar().show();
+            showViewPagerNavigation(true);
+        }
+
+        if (null == savedInstanceState) {
+            mRecipeId = getIntent().getIntExtra(EXTRA_RECIPE_ID, mRecipeId);
+            mStepPosition = getIntent().getIntExtra(EXTRA_STEP_POSITION, mStepPosition);
+        } else {
+            mRecipeId = savedInstanceState.getInt(STATE_RECIPE_ID, mRecipeId);
+            mStepPosition = savedInstanceState.getInt(STATE_STEP_POSITION, mStepPosition);
+        }
 
         mPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
             public void onPageSelected(int stepIndex) {
-                setUpNavigation(stepIndex);
-                mProgressBar.setProgress(stepIndex);
+                mStepPosition = stepIndex;
+                setUpNavigation();
+                mProgressBar.setProgress(mStepPosition);
             }
         });
 
@@ -87,40 +109,47 @@ public class RecipeStepsActivity extends AppCompatActivity {
                 .get(RecipeViewModel.class);
 
         mRecipeViewModel.getRecipe()
-                .observe(this, recipe -> {
+                .subscribe(recipe -> {
                     getSupportActionBar().setTitle(recipe.name);
 
                     if (null == mPagerAdaper) {
                         init(recipe);
                     }
 
-                    int currentStep = recipe.getStepIndexFromId(mStepId);
                     int totalSteps = mPagerAdaper.getCount();
                     mProgressBar.setMax(totalSteps - 1);
-                    mProgressBar.setProgress(currentStep);
-                    mPager.setCurrentItem(currentStep);
-                    setUpNavigation(currentStep);
+                    mProgressBar.setProgress(mStepPosition);
+                    mPager.setCurrentItem(mStepPosition);
+                    setUpNavigation();
                 });
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putInt(STATE_RECIPE_ID, mRecipeId);
+        outState.putInt(STATE_STEP_POSITION, mStepPosition);
+        super.onSaveInstanceState(outState);
     }
 
     @OnClick({R.id.action_back, R.id.action_next})
     public void onNavigationClick(View view) {
-        int currentStep = mPager.getCurrentItem();
+        mStepPosition = mPager.getCurrentItem();
         switch (view.getId()) {
             case R.id.action_back:
-                mPager.setCurrentItem(--currentStep);
+                mStepPosition -= 1;
                 break;
             case R.id.action_next:
-                mPager.setCurrentItem(++currentStep);
+                mStepPosition += 1;
                 break;
         }
+        mPager.setCurrentItem(mStepPosition);
     }
 
     private void init(@NonNull final Recipe recipe) {
         mPagerAdaper = new FragmentStatePagerAdapter(getSupportFragmentManager()) {
             @Override
             public Fragment getItem(final int stepIndex) {
-                return RecipeStepFragment.newInstance(recipe.steps.get(stepIndex));
+                return RecipeStepFragment.newInstance(recipe.id, stepIndex);
             }
 
             @Override
@@ -131,13 +160,13 @@ public class RecipeStepsActivity extends AppCompatActivity {
         mPager.setAdapter(mPagerAdaper);
     }
 
-    private void setUpNavigation(final int stepIndex) {
-        if (stepIndex == 0) {
+    private void setUpNavigation() {
+        if (mStepPosition == 0) {
             mBackButton.setEnabled(false);
-            if (stepIndex < mPagerAdaper.getCount() - 1) {
+            if (mStepPosition < mPagerAdaper.getCount() - 1) {
                 mNextButton.setEnabled(true);
             }
-        } else if (stepIndex == mPagerAdaper.getCount() - 1) {
+        } else if (mStepPosition == mPagerAdaper.getCount() - 1) {
             mNextButton.setEnabled(false);
             mBackButton.setEnabled(true);
         } else {
@@ -152,5 +181,22 @@ public class RecipeStepsActivity extends AppCompatActivity {
         mNextButton.setVisibility(visibility);
         mProgressBar.setVisibility(visibility);
         mRoot.setFitsSystemWindows(show);
+    }
+
+    private void hideSystemUI() {
+        View decorView = getWindow().getDecorView();
+        int uiOptions = View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // hide nav bar
+                | View.SYSTEM_UI_FLAG_FULLSCREEN // hide status bar
+                | View.SYSTEM_UI_FLAG_IMMERSIVE;
+        decorView.setSystemUiVisibility(uiOptions);
+    }
+
+    private void showSystemUI() {
+        View decorView = getWindow().getDecorView();
+        int uiOptions = View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
+        decorView.setSystemUiVisibility(uiOptions);
     }
 }

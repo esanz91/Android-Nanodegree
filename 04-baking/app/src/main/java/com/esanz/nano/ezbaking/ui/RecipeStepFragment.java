@@ -1,20 +1,26 @@
 package com.esanz.nano.ezbaking.ui;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
-import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.util.Pair;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.esanz.nano.ezbaking.EzBakingApplication;
 import com.esanz.nano.ezbaking.R;
+import com.esanz.nano.ezbaking.respository.model.Recipe;
 import com.esanz.nano.ezbaking.respository.model.Step;
+import com.esanz.nano.ezbaking.ui.viewmodel.RecipeViewModel;
+import com.esanz.nano.ezbaking.ui.viewmodel.RecipeViewModelFactory;
 import com.esanz.nano.ezbaking.utils.ViewUtils;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlayerFactory;
@@ -30,15 +36,21 @@ import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
+import com.jakewharton.rxrelay2.BehaviorRelay;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import io.reactivex.Observable;
+import io.reactivex.disposables.CompositeDisposable;
 
 public class RecipeStepFragment extends Fragment {
 
-    private static final String ARG_STEP = "step";
-    private static final String STATE_STEP = "step";
+    private static final String ARG_RECIPE_ID = "recipe_id";
+    private static final String ARG_STEP_POSITION = "step_position";
+
+    private static final String STATE_RECIPE_ID = "recipe_id";
+    private static final String STATE_STEP_POSITION = "step_position";
     private static final String STATE_VIDEO_AUTO_PLAY = "video_auto_play";
     private static final String STATE_VIDEO_POSITION = "video_position";
     private static final String STATE_WINDOW_POSITION = "window_position";
@@ -47,7 +59,13 @@ public class RecipeStepFragment extends Fragment {
     private long mVideoPosition = C.TIME_UNSET;
     private int mWindowPosition = C.INDEX_UNSET;
 
-    private Step mStep;
+    private final CompositeDisposable disposables = new CompositeDisposable();
+    private final BehaviorRelay<Boolean> mIsVisible = BehaviorRelay.createDefault(false);
+
+    private int mRecipeId;
+    private int mStepPosition;
+    private String mVideoUrl;
+    private RecipeViewModel mRecipeViewModel;
     private SimpleExoPlayer mPlayer;
     private DefaultTrackSelector mTrackSelector;
     private MediaSource mMediaSource;
@@ -63,32 +81,13 @@ public class RecipeStepFragment extends Fragment {
         // Required empty public constructor
     }
 
-    public static RecipeStepFragment newInstance(@NonNull final Step step) {
+    public static RecipeStepFragment newInstance(final int recipeId, final int stepPosition) {
         RecipeStepFragment fragment = new RecipeStepFragment();
         Bundle args = new Bundle();
-        args.putParcelable(ARG_STEP, step);
+        args.putInt(ARG_RECIPE_ID, recipeId);
+        args.putInt(ARG_STEP_POSITION, stepPosition);
         fragment.setArguments(args);
         return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mStep = getArguments().getParcelable(ARG_STEP);
-        }
-
-        View decorView = getActivity().getWindow().getDecorView();
-        decorView.setOnSystemUiVisibilityChangeListener
-                (visibility -> {
-                    if ((visibility & View.SYSTEM_UI_FLAG_FULLSCREEN) != 0) {
-                        RecipeStepsActivity activity = (RecipeStepsActivity) getActivity();
-                        if (null != activity) {
-                            activity.getSupportActionBar().hide();
-                            activity.showViewPagerNavigation(false);
-                        }
-                    }
-                });
     }
 
     @Override
@@ -104,108 +103,123 @@ public class RecipeStepFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         if (null != savedInstanceState) {
-            mStep = savedInstanceState.getParcelable(STATE_STEP);
+            mRecipeId = savedInstanceState.getInt(STATE_RECIPE_ID);
+            mStepPosition = savedInstanceState.getInt(STATE_STEP_POSITION);
             mVideoAutoPlay = savedInstanceState.getBoolean(STATE_VIDEO_AUTO_PLAY);
             mVideoPosition = savedInstanceState.getLong(STATE_VIDEO_POSITION);
             mWindowPosition = savedInstanceState.getInt(STATE_WINDOW_POSITION);
+        } else if (null != getArguments()) {
+            mRecipeId = getArguments().getInt(ARG_RECIPE_ID);
+            mStepPosition = getArguments().getInt(ARG_STEP_POSITION);
         }
 
-        if (null != mStep) {
-            bindStep(mStep, false);
-        }
+        RecipeViewModelFactory recipeViewModelFactory = new RecipeViewModelFactory(
+                EzBakingApplication.RECIPE_REPOSITORY, mRecipeId);
+        mRecipeViewModel = ViewModelProviders.of(this, recipeViewModelFactory)
+                .get(RecipeViewModel.class);
+
+        disposables.add(Observable.combineLatest(
+                mIsVisible,
+                mRecipeViewModel.getRecipe(),
+                Pair::new
+        ).subscribe(result -> {
+            boolean isVisible = result.first;
+            Recipe recipe = result.second;
+            Step step = recipe.steps.get(mStepPosition);
+            mVideoUrl = step.videoURL;
+
+            // setup UI
+            mPlayerView.setVisibility(step.hasVideoUrl() ? View.VISIBLE : View.GONE);
+            mDescription.setText(step.description);
+
+            // setup video
+            if (!TextUtils.isEmpty(mVideoUrl)) {
+                if (isVisible) {
+                    mVideoAutoPlay = true;
+                    initializePlayer(mVideoUrl);
+                } else {
+                    pausePlayer();
+                }
+            }
+        }));
     }
 
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
-        if (!isVisibleToUser) {
-            pausePlayer();
-        }
+        mIsVisible.accept(isVisibleToUser);
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        if (mStep.hasVideoUrl() && Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
-            initializePlayer();
+        mIsVisible.accept(getUserVisibleHint());
+        if (!TextUtils.isEmpty(mVideoUrl) && Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
+            initializePlayer(mVideoUrl);
         }
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        if (mStep.hasVideoUrl() && (Build.VERSION.SDK_INT <= Build.VERSION_CODES.M || mPlayer == null)) {
-            initializePlayer();
+        if (!TextUtils.isEmpty(mVideoUrl) && (Build.VERSION.SDK_INT <= Build.VERSION_CODES.M || mPlayer == null)) {
+            initializePlayer(mVideoUrl);
         }
     }
 
     @Override
     public void onPause() {
-        super.onPause();
-        if (mStep.hasVideoUrl() && Build.VERSION.SDK_INT <= Build.VERSION_CODES.M) {
+        mIsVisible.accept(false);
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.M) {
             releasePlayer();
         }
+        super.onPause();
     }
 
     @Override
     public void onStop() {
-        super.onStop();
-        if (mStep.hasVideoUrl() && Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
             releasePlayer();
         }
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-
-        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            hideSystemUI();
-        } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
-            showSystemUI();
-
-            RecipeStepsActivity activity = (RecipeStepsActivity) getActivity();
-            if (null != activity) {
-                activity.getSupportActionBar().show();
-                activity.showViewPagerNavigation(true);
-            }
-        }
+        super.onStop();
     }
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
-        outState.putParcelable(STATE_STEP, mStep);
-        if (null != mPlayer) {
-            updateStartPosition();
-            outState.putBoolean(STATE_VIDEO_AUTO_PLAY, mVideoAutoPlay);
-            outState.putLong(STATE_VIDEO_POSITION, mVideoPosition);
-            outState.putInt(STATE_WINDOW_POSITION, mWindowPosition);
-        }
+        outState.putInt(STATE_RECIPE_ID, mRecipeId);
+        outState.putInt(STATE_STEP_POSITION, mStepPosition);
+
+        updateStartPosition();
+        outState.putBoolean(STATE_VIDEO_AUTO_PLAY, mVideoAutoPlay);
+        outState.putLong(STATE_VIDEO_POSITION, mVideoPosition);
+        outState.putInt(STATE_WINDOW_POSITION, mWindowPosition);
+
         super.onSaveInstanceState(outState);
     }
 
     @Override
     public void onDestroyView() {
         mUnbinder.unbind();
+        disposables.dispose();
         super.onDestroyView();
     }
 
-    public void bindStep(@NonNull final Step step, boolean reset) {
-        if (reset) {
-            mStep = step;
-            if (mStep.hasVideoUrl()) {
-                mVideoAutoPlay = true;
-                initializePlayer();
-            } else {
-                pausePlayer();
-            }
-        }
+    public void bindStep(@NonNull final Step step) {
+        // setup UI
+        mVideoUrl = step.videoURL;
+        mPlayerView.setVisibility(step.hasVideoUrl() ? View.VISIBLE : View.GONE);
+        mDescription.setText(step.description);
 
-        mPlayerView.setVisibility(mStep.hasVideoUrl() ? View.VISIBLE : View.GONE);
-        mDescription.setText(mStep.description);
+        // setup video
+        if (step.hasVideoUrl()) {
+            mVideoAutoPlay = true;
+            initializePlayer(mVideoUrl);
+        } else {
+            pausePlayer();
+        }
     }
 
-    private void initializePlayer() {
+    private void initializePlayer(String url) {
         if (null == mPlayer) {
             BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
             TrackSelection.Factory videoTrackSelectionFactory = new AdaptiveTrackSelection.Factory(bandwidthMeter);
@@ -214,14 +228,13 @@ public class RecipeStepFragment extends Fragment {
             mPlayerView.setPlayer(mPlayer);
         }
 
+        mMediaSource = getMediaSource(Uri.parse(url));
         boolean haveStartPosition = mWindowPosition != C.INDEX_UNSET;
         if (haveStartPosition) {
             mPlayer.seekTo(mWindowPosition, mVideoPosition);
         }
-
-        mMediaSource = getMediaSource(Uri.parse(mStep.videoURL));
-        mPlayer.prepare(mMediaSource, !haveStartPosition, false);
         mPlayer.setPlayWhenReady(mVideoAutoPlay);
+        mPlayer.prepare(mMediaSource, !haveStartPosition, false);
     }
 
     private MediaSource getMediaSource(@NonNull final Uri videoUri) {
@@ -235,7 +248,7 @@ public class RecipeStepFragment extends Fragment {
     }
 
     private void updateStartPosition() {
-        if (mPlayer != null) {
+        if (null != mPlayer) {
             mVideoAutoPlay = mPlayer.getPlayWhenReady();
             mVideoPosition = Math.max(0, mPlayer.getContentPosition());
             mWindowPosition = mPlayer.getCurrentWindowIndex();
@@ -258,23 +271,6 @@ public class RecipeStepFragment extends Fragment {
             mPlayer.setPlayWhenReady(false);
             mVideoAutoPlay = mPlayer.getPlayWhenReady();
         }
-    }
-
-    private void hideSystemUI() {
-        View decorView = getActivity().getWindow().getDecorView();
-        int uiOptions = View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // hide nav bar
-                | View.SYSTEM_UI_FLAG_FULLSCREEN // hide status bar
-                | View.SYSTEM_UI_FLAG_IMMERSIVE;
-        decorView.setSystemUiVisibility(uiOptions);
-    }
-
-    private void showSystemUI() {
-        View decorView = getActivity().getWindow().getDecorView();
-        int uiOptions = View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
-        decorView.setSystemUiVisibility(uiOptions);
     }
 
 }
