@@ -3,11 +3,8 @@ package com.esanz.nano.ezbaking.respository.model;
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
-import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.text.TextUtils;
 
 import com.esanz.nano.ezbaking.respository.RecipeDetail;
@@ -20,7 +17,7 @@ import com.google.gson.annotations.SerializedName;
                 parentColumns = Recipe.COLUMN_PRIMARY_KEY,
                 childColumns = Step.COLUMN_FOREIGN_KEY,
                 onDelete = ForeignKey.CASCADE))
-public class Step implements RecipeDetail, Parcelable {
+public class Step implements RecipeDetail {
 
     public static final String TITLE = "Instructions";
 
@@ -66,47 +63,6 @@ public class Step implements RecipeDetail, Parcelable {
     @Override
     public String getTitle() {
         return TITLE;
-    }
-
-    public Step() {
-        // required
-    }
-
-    @Ignore
-    protected Step(Parcel in) {
-        recipeId = in.readInt();
-        position = in.readInt();
-        description = in.readString();
-        shortDescription = in.readString();
-        videoURL = in.readString();
-        thumbnailURL = in.readString();
-    }
-
-    public static final Creator<Step> CREATOR = new Creator<Step>() {
-        @Override
-        public Step createFromParcel(Parcel in) {
-            return new Step(in);
-        }
-
-        @Override
-        public Step[] newArray(int size) {
-            return new Step[size];
-        }
-    };
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(recipeId);
-        dest.writeInt(position);
-        dest.writeString(description);
-        dest.writeString(shortDescription);
-        dest.writeString(videoURL);
-        dest.writeString(thumbnailURL);
     }
 
     public boolean hasVideoUrl() {
