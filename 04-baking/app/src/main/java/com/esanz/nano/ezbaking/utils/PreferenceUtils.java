@@ -12,7 +12,7 @@ public class PreferenceUtils {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putInt(KEY_RECIPE_ID, recipeId);
-        editor.commit();
+        editor.apply();
     }
 
     public static int getLastSeenReciper(Context context) {

@@ -54,7 +54,7 @@ public class ListWidgetService extends RemoteViewsService {
 
         @Override
         public RemoteViews getViewAt(int position) {
-            if (mIngredients.size() == 0) return null;
+            if (mIngredients.size() == 0 || position >= mIngredients.size()) return null;
 
             Ingredient ingredient = mIngredients.get(position);
             RemoteViews views = new RemoteViews(mContext.getPackageName(), R.layout.list_item_ingredient);
