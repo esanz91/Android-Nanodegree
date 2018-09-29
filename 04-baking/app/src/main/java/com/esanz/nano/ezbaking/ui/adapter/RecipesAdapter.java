@@ -46,7 +46,7 @@ public class RecipesAdapter extends SimpleRecyclerAdapter<Recipe> {
 
         ImageView imageView = holder.get(R.id.image);
         Picasso.with(imageView.getContext())
-                .load(!TextUtils.isEmpty(recipe.image) ? recipe.image : null)
+                .load(recipe.getImage())
                 .placeholder(recipe.getBackupImage())
                 .into(imageView);
     }

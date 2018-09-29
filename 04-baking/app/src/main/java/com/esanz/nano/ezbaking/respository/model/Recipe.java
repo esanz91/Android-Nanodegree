@@ -6,6 +6,8 @@ import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.DrawableRes;
+import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
 import com.esanz.nano.ezbaking.R;
 import com.google.gson.annotations.SerializedName;
@@ -54,13 +56,9 @@ public class Recipe {
     @SerializedName("steps")
     public List<Step> steps;
 
-    public int getStepIndexFromId(final int stepId) {
-        for (Step step : steps) {
-            if (stepId == step.id) {
-                return step.position;
-            }
-        }
-        return -1;
+    @Nullable
+    public String getImage() {
+        return !TextUtils.isEmpty(image) ? image : null;
     }
 
     @DrawableRes

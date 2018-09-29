@@ -5,9 +5,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 
 import com.esanz.nano.ezbaking.EzBakingApplication;
 import com.esanz.nano.ezbaking.R;
@@ -15,11 +18,13 @@ import com.esanz.nano.ezbaking.respository.model.Recipe;
 import com.esanz.nano.ezbaking.respository.model.Step;
 import com.esanz.nano.ezbaking.ui.viewmodel.RecipeViewModel;
 import com.esanz.nano.ezbaking.ui.viewmodel.RecipeViewModelFactory;
+import com.squareup.picasso.Picasso;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import timber.log.Timber;
 
 public class RecipeDetailActivity extends AppCompatActivity
         implements RecipeDetailFragment.OnStepClickListener {
@@ -61,16 +66,26 @@ public class RecipeDetailActivity extends AppCompatActivity
         mRecipeViewModel = ViewModelProviders.of(this, recipeViewModelFactory)
                 .get(RecipeViewModel.class);
 
+        disposables.add(mRecipeViewModel.getRecipe()
+                .subscribe(recipe -> {
+                    if (mIsTwoPane) {
+                        getSupportActionBar().setTitle(recipe.name);
+                        if (null == savedInstanceState) {
+                            initDetails();
+                            initStep(recipe.steps.get(0));
+                        }
+                    } else {
+                        ((CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar)).setTitle(recipe.name);
+                        Picasso.with(this)
+                                .load(recipe.getImage())
+                                .placeholder(recipe.getBackupImage())
+                                .into((ImageView) findViewById(R.id.recipe_image));
+                        if (null == savedInstanceState) {
+                            initDetails();
+                        }
+                    }
+                }, Timber::e));
 
-
-        if (null == savedInstanceState) {
-            initDetails();
-
-            if (mIsTwoPane) {
-                disposables.add(mRecipeViewModel.getRecipe()
-                        .subscribe(recipe -> initStep(recipe.steps.get(0))));
-            }
-        }
     }
 
     @Override
