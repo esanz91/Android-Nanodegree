@@ -1,5 +1,5 @@
 # Android Nanodegree
-A repository of all the projects completed for the **Grow with Google Android Developer Nanodegree Scholarship Program**
+A repository of all the projects built from **scratch** for the **Grow with Google Android Developer Nanodegree Scholarship Program**
 
 ## Part 3
 ### Project 4: *Baking App*
