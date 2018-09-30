@@ -21,13 +21,22 @@ A repository of all the projects completed for the **Grow with Google Android De
 - [x] Exoplayer
 - [x] Espresso
 
-### Features
+#### Features
 - [x] companion home screen widget 
 - [x] fullscreen mode enabled for video in landscape view (phone only)
 
-### Design
+#### Designs
+*phone:*
 
 <img src="04-baking/images/ezbaking_sample.gif" width="300">
+
+*tablet:*
+
+<img src="04-baking/images/tablet_recipe_list.png" width="600">
+
+<img src="04-baking/images/tablet_recipe_master_detail.png" width="600">
+
+<img src="04-baking/images/widget.png" width="600">
 
 
 ## Part 2
